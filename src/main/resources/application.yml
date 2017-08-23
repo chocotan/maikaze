@@ -2,8 +2,7 @@ server:
   port: 10000
   session:
     persistent: true
-  tomcat:
-    basedir: ${java.io.tmpdir}/maikaze
+    store-dir: ${java.io.tmpdir}/maikaze
 spring:
   output:
     ansi:
@@ -41,6 +40,7 @@ kancolle:
   proxy: true
   proxy-ip: localhost
   proxy-port: 1080
+  proxy-type: HTTP
 
 zuul:
   routes:

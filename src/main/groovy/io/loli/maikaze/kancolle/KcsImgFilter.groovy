@@ -56,7 +56,6 @@ public class KcsImgFilter extends ZuulFilter {
                         .mapToObj({ String.format("%03d", it) })
                         .collect(Collectors.joining("_"))
                 URL url = UriComponentsBuilder.fromHttpUrl(worldUrl).path(imgPath)
-                        .port(new Integer(80))
                         .build().toUri().toURL();
                 ctx.setRouteHost(url);
 
@@ -64,7 +63,6 @@ public class KcsImgFilter extends ZuulFilter {
                 def map = new LinkedMultiValueMap<>();
                 ctx.getRequest().getParameterMap().each {map.add(it.key,it.value[0])}
                 URL url = UriComponentsBuilder.fromHttpUrl(worldUrl).path(ctx.getRequest().getRequestURI())
-                        .port(new Integer(80))
                         .queryParams(map)
                         .build().toUri().toURL();
                 ctx.setRouteHost(url);

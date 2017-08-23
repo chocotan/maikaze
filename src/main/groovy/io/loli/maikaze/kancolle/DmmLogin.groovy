@@ -15,9 +15,10 @@ class DmmLogin {
 
     @Autowired
     LoginContextCache loginContextCache;
+
     @RequestMapping("/dmmLogin")
     def getGameFlashUrl(String username, String password, HttpServletRequest request) {
-        def lctx = loginContextCache.get(username, password, request.getSession());
+        def lctx = loginContextCache.get(username, password, request.getSession(), true);
         request.session.setAttribute("lctx", lctx)
         lctx.user_agent = request.getHeader("User-Agent");
         lctx.reset(username, password)

@@ -23,11 +23,16 @@ class LoginContextCache {
     KancolleProperties kcp;
 
 
-    public LoginContext get(String username, String password, HttpSession session) {
-        if (session && session.getAttribute("lctx")) {
-            return contextCache.get("$username^^$password",{session.getAttribute("lctx")});
+    public LoginContext get(String username, String password, HttpSession session, def clear = false) {
+        if (clear) {
+            contextCache.invalidate("$username^^$password")
         }
-        HttpClientUtil httpClientUtil = kcp.proxy ? new HttpClientUtil(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(kcp.proxyIp, kcp.proxyPort))) :
+
+        if (session && session.getAttribute("lctx")) {
+            return contextCache.get("$username^^$password", { session.getAttribute("lctx") });
+        }
+
+        HttpClientUtil httpClientUtil = kcp.proxy ? new HttpClientUtil(new Proxy(Proxy.Type.valueOf(kcp.proxyType), new InetSocketAddress(kcp.proxyIp, kcp.proxyPort))) :
                 new HttpClientUtil();
         return contextCache.get("$username^^$password", {
             new LoginContext(properties: kcp, httpClientUtil: httpClientUtil)

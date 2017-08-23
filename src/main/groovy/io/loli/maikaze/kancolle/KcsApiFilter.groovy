@@ -34,7 +34,7 @@ public class KcsApiFilter extends ZuulFilter {
     @Override
     public boolean shouldFilter() {
         RequestContext ctx = RequestContext.getCurrentContext();
-        return ctx.getRequest().getRequestURI().startsWith("/kcsapi/*");
+        return ctx.getRequest().getRequestURI().startsWith("/kcsapi/");
     }
 
     @Override
@@ -45,7 +45,6 @@ public class KcsApiFilter extends ZuulFilter {
         try {
             def worldUrl = "http://" + loginContext.$5_world_ip
             URL url = UriComponentsBuilder.fromHttpUrl(worldUrl).path(ctx.getRequest().getRequestURI())
-                    .port(new Integer(80))
                     .queryParams(new LinkedMultiValueMap<String, String>(ctx.getRequestQueryParams()))
                     .build().toUri().toURL();
             ctx.setRouteHost(url);
