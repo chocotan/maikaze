@@ -1,0 +1,53 @@
+server:
+  port: 10000
+  session:
+    persistent: true
+  tomcat:
+    basedir: ${java.io.tmpdir}/maikaze
+spring:
+  output:
+    ansi:
+      enabled: always
+kancolle:
+  server-list:
+     - 203.104.209.71
+     - 203.104.209.87
+     - 125.6.184.16
+     - 125.6.187.205
+     - 125.6.187.229
+     - 125.6.187.253
+     - 125.6.188.25
+     - 203.104.248.135
+     - 125.6.189.7
+     - 125.6.189.39
+     - 125.6.189.71
+     - 125.6.189.103
+     - 125.6.189.135
+     - 125.6.189.167
+     - 125.6.189.215
+     - 125.6.189.247
+     - 203.104.209.23
+     - 203.104.209.39
+     - 203.104.209.55
+     - 203.104.209.102
+  login-url: https://www.dmm.com/my/-/login/
+  ajax-get-token-url: https://www.dmm.com/my/-/login/ajax-get-token
+  auth-url: https://www.dmm.com/my/-/login/auth/
+  game-url: http://www.dmm.com/netgame/social/-/gadgets/=/app_id=854854/
+  make-request-url: http://osapi.dmm.com/gadgets/makeRequest
+  get-world-url: http://203.104.209.7/kcsapi/api_world/get_id/%s/1/%d
+  get-flash-url: http://%s/kcsapi/api_auth_member/dmmlogin/%s/1/%d
+  main-flash-url: http://%s/kcs/mainD2.swf?api_token=%s&api_starttime=%s
+  proxy: true
+  proxy-ip: localhost
+  proxy-port: 1080
+
+zuul:
+  routes:
+    kancolle:
+      path: /kcsapi/**
+      url: http://localhost:10000/
+    kcstatic:
+      path: /kcs/**
+      url: http://localhost:10000/
+
