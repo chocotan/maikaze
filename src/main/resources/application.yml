@@ -11,6 +11,7 @@ spring:
     console:
       enabled: true
       path: /admin/h2-console
+
   jpa:
     hibernate:
       ddl-auto: update

@@ -9,6 +9,7 @@
     <packaging>jar</packaging>
 
     <name>maikaze</name>
+    <url>https://github.com/chocotan/maikaze</url>
     <description>Online kancolle</description>
 
     <parent>
@@ -121,6 +122,14 @@
             <artifactId>webjars-locator</artifactId>
             <version>0.30</version>
         </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.thymeleaf.extras</groupId>
+            <artifactId>thymeleaf-extras-springsecurity4</artifactId>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -161,6 +170,22 @@
                 </executions>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.html</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/*.html</exclude>
+                </excludes>
+            </resource>
+        </resources>
     </build>
 
 

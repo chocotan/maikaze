@@ -1,9 +1,7 @@
-package io.loli.maikaze.domains;
+package io.loli.maikaze.domains
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import java.util.Date;
-
+import javax.persistence.Entity
+import javax.persistence.Id
 /**
  * @author choco
  */

@@ -1,4 +1,4 @@
-package io.loli.maikaze;
+package io.loli.maikaze.repository;
 
 import io.loli.maikaze.domains.PersistentLogins;
 import org.springframework.data.jpa.repository.JpaRepository;
