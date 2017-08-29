@@ -44,8 +44,7 @@ public class KcsApiFilter extends ZuulFilter {
         RequestContext ctx = RequestContext.getCurrentContext();
         try {
             def worldUrl = "http://" + loginContext.$5_world_ip
-            URL url = UriComponentsBuilder.fromHttpUrl(worldUrl).path(ctx.getRequest().getRequestURI())
-                    .queryParams(new LinkedMultiValueMap<String, String>(ctx.getRequestQueryParams()))
+            URL url = UriComponentsBuilder.fromHttpUrl(worldUrl)
                     .build().toUri().toURL();
             ctx.setRouteHost(url);
         } catch (Exception e) {

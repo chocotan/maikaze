@@ -1,5 +1,5 @@
 server:
-  port: 10000
+  port: 80
   session:
     persistent: true
     store-dir: ${java.io.tmpdir}/maikaze
@@ -7,6 +7,22 @@ spring:
   output:
     ansi:
       enabled: always
+  h2:
+    console:
+      enabled: true
+      path: /admin/h2-console
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:h2:file:~/maikaze/db;FILE_LOCK=FS
+    username: sa
+    password: sa
+  messages:
+    basename: i18n/message
+
+  thymeleaf:
+    cache: false
 kancolle:
   server-list:
      - 203.104.209.71
@@ -42,6 +58,10 @@ kancolle:
   proxy-port: 1080
   proxy-type: HTTP
 
+ribbon:
+  okhttp:
+    enabled: true
+
 zuul:
   routes:
     kancolle:
@@ -50,4 +70,6 @@ zuul:
     kcstatic:
       path: /kcs/**
       url: http://localhost:10000/
-
+  host:
+    connect-timeout-millis: 10000
+    socket-timeout-millis: 10000

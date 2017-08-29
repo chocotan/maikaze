@@ -23,6 +23,8 @@ class LoginContextCache {
     KancolleProperties kcp;
 
 
+
+
     public LoginContext get(String username, String password, HttpSession session, def clear = false) {
         if (clear) {
             contextCache.invalidate("$username^^$password")

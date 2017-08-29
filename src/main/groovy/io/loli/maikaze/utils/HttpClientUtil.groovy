@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON
 import okhttp3.*
 import org.springframework.web.util.UriComponentsBuilder
 
+import java.util.concurrent.TimeUnit
+
 /**
  * Created by uzuma on 2017/8/20.
  */
@@ -16,11 +18,19 @@ public class HttpClientUtil {
     CookieJar cookieJar = new JavaNetCookieJar(cookieManager)
 
     HttpClientUtil() {
-        client = new OkHttpClient().newBuilder().cookieJar(cookieJar).build()
+        client = new OkHttpClient().newBuilder().cookieJar(cookieJar)
+                .connectTimeout(20, TimeUnit.SECONDS)
+                .readTimeout(20, TimeUnit.SECONDS)
+                .writeTimeout(20, TimeUnit.SECONDS)
+                .build()
     }
 
     HttpClientUtil(Proxy proxy) {
-        client = new OkHttpClient().newBuilder().cookieJar(cookieJar).proxy(proxy).build()
+        client = new OkHttpClient().newBuilder().cookieJar(cookieJar).proxy(proxy)
+                .connectTimeout(20, TimeUnit.SECONDS)
+                .readTimeout(20, TimeUnit.SECONDS)
+                .writeTimeout(20, TimeUnit.SECONDS)
+                .build()
     }
     private OkHttpClient client
 
