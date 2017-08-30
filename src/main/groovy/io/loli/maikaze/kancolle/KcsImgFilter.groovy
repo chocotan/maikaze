@@ -19,7 +19,7 @@ import java.util.stream.Collectors
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
 
 /**
- * Created by uzuma on 2017/8/22.
+ * Created by chocotan on 2017/8/22.
  */
 @Component
 public class KcsImgFilter extends ZuulFilter {

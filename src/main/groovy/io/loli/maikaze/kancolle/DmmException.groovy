@@ -1,7 +1,7 @@
 package io.loli.maikaze.kancolle;
 
 /**
- * Created by uzuma on 2017/8/24.
+ * Created by chocotan on 2017/8/24.
  */
 public class DmmException extends RuntimeException{
     public DmmException() {

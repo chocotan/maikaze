@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.util.UriComponentsBuilder
 
 /**
- * Created by uzuma on 2017/8/20.
+ * Created by chocotan on 2017/8/20.
  */
 public class LoginContext {
     static final Logger logger = LoggerFactory.getLogger(LoginContext)

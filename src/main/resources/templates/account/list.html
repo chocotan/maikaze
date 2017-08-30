@@ -1,0 +1,21 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout">
+<head>
+    <title><span th:utext="DMM账号列表" th:remove="tag"></span></title>
+</head>
+<body>
+
+<div class="content" layout:fragment="content">
+    账号列表
+
+    <table>
+        <tr th:each="account: ${list}">
+            <td th:text="${account.username}"></td>
+        </tr>
+
+    </table>
+</div>
+</body>
+</html>

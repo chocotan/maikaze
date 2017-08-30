@@ -38,6 +38,7 @@ public class RepositoryUserDetailsService implements UserDetailsService {
         MaikazeUserDetails principal = builder
                 .username(user.getUserName())
                 .email(user.getEmail())
+                .user(user)
                 .build();
 
         return principal;

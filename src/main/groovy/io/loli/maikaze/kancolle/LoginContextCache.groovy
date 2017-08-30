@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 import javax.servlet.http.HttpSession
 
 /**
- * Created by uzuma on 2017/8/22.
+ * Created by chocotan on 2017/8/22.
  */
 @Component
 class LoginContextCache {

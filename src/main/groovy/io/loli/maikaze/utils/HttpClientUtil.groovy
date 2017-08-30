@@ -7,7 +7,7 @@ import org.springframework.web.util.UriComponentsBuilder
 import java.util.concurrent.TimeUnit
 
 /**
- * Created by uzuma on 2017/8/20.
+ * Created by chocotan on 2017/8/20.
  */
 public class HttpClientUtil {
     CookieManager cookieManager = new CookieManager();

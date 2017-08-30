@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpServletRequest
 
 /**
- * Created by uzuma on 2017/8/20.
+ * Created by chocotan on 2017/8/20.
  */
 @RestController
 class DmmLogin {

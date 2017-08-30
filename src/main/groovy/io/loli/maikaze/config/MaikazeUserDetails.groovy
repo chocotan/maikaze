@@ -1,6 +1,7 @@
 package io.loli.maikaze.config;
 
-import io.loli.maikaze.domains.Role;
+import io.loli.maikaze.domains.Role
+import io.loli.maikaze.domains.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -17,6 +18,8 @@ public class MaikazeUserDetails extends org.springframework.security.core.userde
 
 
     private Role role;
+
+    private User user
 
 
     public MaikazeUserDetails(String username, String password, Collection<? extends GrantedAuthority> authorities) {
@@ -40,6 +43,8 @@ public class MaikazeUserDetails extends org.springframework.security.core.userde
 
         private Role role;
 
+
+        private User user;
         private Set<GrantedAuthority> authorities;
 
         public Builder() {
@@ -73,6 +78,10 @@ public class MaikazeUserDetails extends org.springframework.security.core.userde
             this.email = email;
             return this;
         }
+        public Builder user(User user){
+            this.user = user;
+            this
+        }
 
         public Builder username(String username) {
             this.username = username;
@@ -84,6 +93,7 @@ public class MaikazeUserDetails extends org.springframework.security.core.userde
             user.id = id;
             user.role = role;
             user.email = email;
+            user.user = this.user;
             return user;
         }
     }
@@ -96,4 +106,9 @@ public class MaikazeUserDetails extends org.springframework.security.core.userde
     public String getEmail() {
         return email;
     }
+
+    User getUser() {
+        return user
+    }
+
 }

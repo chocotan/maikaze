@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.List;
 
 /**
- * Created by uzuma on 2017/8/20.
+ * Created by chocotan on 2017/8/20.
  */
 @ConfigurationProperties(prefix = "kancolle")
 class KancolleProperties {

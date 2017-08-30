@@ -29,7 +29,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SIMPLE_HOST_ROUTING_FILTER_ORDER;
 
 /**
- * Created by uzuma on 2017/8/26.
+ * Created by chocotan on 2017/8/26.
  */
 @Component
 public class KcsProxyHostRoutingFilter extends SimpleHostRoutingFilter {
