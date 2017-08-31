@@ -1,0 +1,23 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout">
+<head>
+    <title><span th:utext="舰队收藏" th:remove="tag"></span></title>
+</head>
+<body>
+
+<div class="content" layout:fragment="content">
+    <div class="main">
+        <div id="flashWrap" style="width: 800px; margin-left: auto; margin-right: auto; height: 480px;">
+            <embed id="externalswf" width="800" height="480" wmode="opaque" quality="high"
+                   bgcolor="#000000" allowscriptaccess="always"
+                   data-th-attr="base='/kcs/'"
+                   type="application/x-shockwave-flash"
+                   th:src="@{'//'+${#httpServletRequest.remoteHost}+${flash}}">
+            </embed>
+        </div>
+    </div>
+</div>
+</body>
+</html>

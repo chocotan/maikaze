@@ -5,6 +5,7 @@ import io.loli.maikaze.utils.HttpClientUtil
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.web.util.UriComponentsBuilder
+
 /**
  * Created by chocotan on 2017/8/20.
  */
@@ -55,11 +56,12 @@ public class LoginContext {
 
 
     def startLogin() {
-        if(!loginToken()){
+        if(!getUserIdFromIframeUrl()){
+            loginToken()
             ajaxGetToken()
             login()
+            getUserIdFromIframeUrl()
         }
-        getUserIdFromIframeUrl()
         getServerIpWithUserId()
         getGameTokenWithServerIp()
     }
@@ -69,16 +71,11 @@ public class LoginContext {
         def start = System.currentTimeMillis();
         def loginPageResult = httpClientUtil.get(properties.loginUrl, null, properties.loginTokenHeaders);
         $1_html = loginPageResult
-        // 不包含这个的时候说明不需要登陆了，直接打开游戏页面
-        if(!loginPageResult.contains("DMM_TOKEN")){
-            return true;
-        }
         def dmmToken = (loginPageResult =~ /"DMM_TOKEN", "(.+)(?=")/)[0][1]
         def token = (loginPageResult =~ /"token": "(.+)(?=")/)[0][1]
         $1_dmm_token = dmmToken
         $1_token = token
         logger.info("GET_TOKEN:DMM_TOKEN=$dmmToken,TOKEN=$token,COST={}", (System.currentTimeMillis() - start))
-        return false;
     }
 
 
@@ -126,6 +123,9 @@ public class LoginContext {
         def start = System.currentTimeMillis();
         def gameResult = httpClientUtil.get(properties.getGameUrl(), null, properties.simpleHeaders)
         $4_html = gameResult
+        if(gameResult.contains("ログイン")&&gameResult.contains("メールアドレス")){
+            return false
+        }
 
         String frameUrl = (gameResult =~ /(?<=")(.*osapi.*owner=.*)(?=")/)[0][0]
         frameUrl = frameUrl.substring(0, frameUrl.lastIndexOf("#"));
@@ -134,6 +134,7 @@ public class LoginContext {
         def params = UriComponentsBuilder.fromHttpUrl(frameUrl).build().getQueryParams();
         $4_owner = params['owner'][0]
         $4_st = new URLDecoder().decode(params['st'][0], 'UTF-8')
+        return true;
     }
 
     def getServerIpWithUserId() {

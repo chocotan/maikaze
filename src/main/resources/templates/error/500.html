@@ -1,0 +1,30 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout">
+<head>
+    <title><span th:text="发生错误了" th:remove="tag"></span></title>
+</head>
+<body>
+<div class="content" layout:fragment="content">
+    <div class="main">
+        <div class="error">
+            <div class="page-header">
+                <h2>
+                    发生错误了
+                </h2>
+
+            </div>
+            <div class="page-body">
+                <div> (type=<span th:text="${error}">Bad</span>, status=<span
+                        th:text="${status}">500</span>)</div>
+                <div id="created" th:text="${#dates.format(timestamp)}"></div>
+                <div th:text="${message}"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+
+</html>

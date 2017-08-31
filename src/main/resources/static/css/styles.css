@@ -65,3 +65,11 @@ a.disabled {
 .page{
     padding-bottom: 100px;
 }
+
+
+.error{
+    width: 50%;
+    min-width: 500px;
+    max-width: 800px;
+    margin: auto;
+}

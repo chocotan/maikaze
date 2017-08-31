@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorator="layout">
 <head>
-    <title><span th:utext="#{signup}" th:remove="tag"></span></title>
+    <title><span th:text="注册" th:remove="tag"></span></title>
 </head>
 <body>
 
@@ -11,7 +11,7 @@
     <div class="login">
         <form th:action="@{/signup}" class="form-horizontal login-form" th:object="${registerDto}" th:method="post">
             <div class="page-header">
-                <h2 th:text="#{signup}"></h2>
+                <h2 th:text="注册"></h2>
             </div>
             <div class="form-group">
                 <label for="inputEmail3" class="col-sm-2 control-label">Email</label>
@@ -22,26 +22,26 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="inputUsername" class="col-sm-2 control-label" th:text="#{username}"></label>
+                <label for="inputUsername" class="col-sm-2 control-label" th:text="用户名"></label>
                 <div class="col-sm-10">
                     <input type="text" name="userName" class="form-control" id="inputUsername"
-                           th:placeholder="#{username}"
+                           th:placeholder="用户名"
                            required="required" th:field="*{userName}"/>
                     <td th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}">UserName Error</td>
                 </div>
             </div>
             <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label" th:text="#{password}"></label>
+                <label for="inputPassword3" class="col-sm-2 control-label" th:text="密码"></label>
                 <div class="col-sm-10">
                     <input type="password" name="password" class="form-control" id="inputPassword3"
-                           th:placeholder="#{password}"
+                           th:placeholder="密码"
                            required="required" th:field="*{password}"/>
                     <td th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</td>
                 </div>
             </div>
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
-                    <button type="submit" class="btn btn-default" th:text="#{signup}"></button>
+                    <button type="submit" class="btn btn-default" th:text="注册"></button>
                 </div>
             </div>
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>

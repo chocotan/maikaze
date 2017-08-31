@@ -30,16 +30,20 @@
                 <tr th:each="account: ${list}">
                     <td th:text="${account.username}"></td>
                     <td th:text="'******'"></td>
-                    <td th:text="${account.lastLogin}"></td>
+                    <td th:text="${#dates.format(account.lastLogin)}" th:if="${account.lastLogin}"></td>
+                    <td th:if="${account.lastLogin eq null}"></td>
                     <td>
                         <a th:href="@{/account/login(id=${account.id})}">登录</a>
-                        <a>进入游戏</a>
                         <a th:href="@{/account/edit(id=${account.id})}">编辑</a>
                         <a th:href="@{/account/delete(id=${account.id})}"> 删除</a>
                     </td>
                 </tr>
                 </tbody>
 
+                <div th:if="${error ne null}" class="alert alert-warning alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <div th:text="${error}"></div>
+                </div>
             </table>
         </div>
     </div>

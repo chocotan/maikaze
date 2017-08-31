@@ -28,7 +28,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("/image/**").permitAll()
                 .and().formLogin().loginPage("/signin").defaultSuccessUrl("/").permitAll()
                 .and().logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll()
-                .and().csrf().ignoringAntMatchers("/admin/**");
+                .and().csrf().ignoringAntMatchers("/admin/**", "/kcs/**", "/kcsapi/**");
 
         http.headers().frameOptions().disable().and()
                 .rememberMe().tokenRepository(reMemberMeRepository);

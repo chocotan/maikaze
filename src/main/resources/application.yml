@@ -60,10 +60,6 @@ kancolle:
   proxy-port: 1080
   proxy-type: HTTP
 
-ribbon:
-  okhttp:
-    enabled: true
-
 zuul:
   routes:
     kancolle:
