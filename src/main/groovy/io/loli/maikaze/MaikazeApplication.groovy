@@ -10,12 +10,14 @@ import org.springframework.cloud.netflix.zuul.EnableZuulServer
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper
 import org.springframework.context.annotation.Bean
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
+import org.springframework.scheduling.annotation.EnableScheduling
 
 @SpringBootApplication
 @EnableConfigurationProperties(KancolleProperties)
 @EnableZuulServer
 @ServletComponentScan
 @EnableJpaRepositories
+@EnableScheduling
 class MaikazeApplication {
 
     static void main(String[] args) {

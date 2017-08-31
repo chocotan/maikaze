@@ -18,6 +18,9 @@ class KancolleProperties {
     def getWorldUrl;
     def getFlashUrl;
     def mainFlashUrl;
+
+    def cachePath;
+
     def loginTokenHeaders = ['User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36']
 
     def idKeysHeaders = [

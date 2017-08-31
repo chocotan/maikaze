@@ -4,20 +4,33 @@
       layout:decorator="layout">
 <head>
     <title><span th:utext="舰队收藏" th:remove="tag"></span></title>
+
+
 </head>
 <body>
-
 <div class="content" layout:fragment="content">
     <div class="main">
         <div id="flashWrap" style="width: 800px; margin-left: auto; margin-right: auto; height: 480px;">
-            <embed id="externalswf" width="800" height="480" wmode="opaque" quality="high"
-                   bgcolor="#000000" allowscriptaccess="always"
-                   data-th-attr="base='/kcs/'"
-                   type="application/x-shockwave-flash"
-                   th:src="@{'//'+${#httpServletRequest.remoteHost}+${flash}}">
-            </embed>
         </div>
     </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var flashUrl = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '') + [[${flash}]];
+        var obj = $("<embed></embed>");
+        obj.attr("id", "externalswf");
+        obj.attr("width", "800");
+        obj.attr("height", "480");
+        obj.attr("quality", "high");
+        obj.attr("wmode", "opaque");
+        obj.attr("bgcolor", "#000000");
+        obj.attr("allowscriptaccess", "always");
+        obj.attr("base", "/kcs/");
+        obj.attr("type", "application/x-shockwave-flash");
+        obj.attr("src", flashUrl);
+        $("#flashWrap").append(obj);
+        /*]]>*/
+    </script>
 </div>
 </body>
 </html>

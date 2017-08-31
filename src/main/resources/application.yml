@@ -59,6 +59,7 @@ kancolle:
   proxy-ip: localhost
   proxy-port: 1080
   proxy-type: HTTP
+  cache-path: ${java.io.tmpdir}/maikaze
 
 zuul:
   routes:
@@ -69,5 +70,5 @@ zuul:
       path: /kcs/**
       url: http://localhost:10000/
   host:
-    connect-timeout-millis: 10000
-    socket-timeout-millis: 10000
+    connect-timeout-millis: 20000
+    socket-timeout-millis: 20000

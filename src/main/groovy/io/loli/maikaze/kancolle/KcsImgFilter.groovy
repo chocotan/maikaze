@@ -5,16 +5,11 @@ import com.netflix.zuul.context.RequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants
 import org.springframework.stereotype.Component
-import org.springframework.util.LinkedMultiValueMap
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.util.UriComponentsBuilder
 
-import javax.servlet.http.HttpSession;
-import java.net.URL
-import java.util.stream.Collectors
+import javax.servlet.http.HttpSession
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
 
@@ -45,13 +40,16 @@ public class KcsImgFilter extends ZuulFilter {
         RequestContext ctx = RequestContext.getCurrentContext();
         return ctx.getRequest().getRequestURI().startsWith("/kcs/");
     }
+    @Autowired
+    LoginAndUserServerCache cache;
 
     @Override
     public Object run() {
-        def loginContext = session.getAttribute("lctx")
+
         RequestContext ctx = RequestContext.getCurrentContext();
+        def worldIp = cache.getServer(ctx.getRequest())
         try {
-            def worldUrl = "http://" + loginContext.$5_world_ip
+            def worldUrl = "http://" + worldIp
             URL url = UriComponentsBuilder.fromHttpUrl(worldUrl)
                     .build().toUri().toURL();
             ctx.setRouteHost(url);

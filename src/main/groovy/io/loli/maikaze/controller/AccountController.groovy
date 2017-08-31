@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 
+import javax.servlet.http.HttpSession
 import java.security.Principal
 
 /**
@@ -39,6 +40,19 @@ class AccountController {
             def tuple = dmmAccountService.login(id)
             def flash = tuple._1()
             model.addAttribute "flash", flash
+            "account/game"
+        } catch (Exception e) {
+            logger.error("登录发生错误了, {}", ExceptionUtils.getStackTrace(e))
+            model.addAttribute "error", e.message
+            list(model, principal)
+        }
+    }
+
+    @RequestMapping(value = "game", method = RequestMethod.GET)
+    def game(Long id, Model model, Principal principal, HttpSession session) {
+        try {
+            def dmm = session.getAttribute("lctx_$id")
+            model.addAttribute "flash", dmm.finalFlashUrl
             "account/game"
         } catch (Exception e) {
             logger.error("登录发生错误了, {}", ExceptionUtils.getStackTrace(e))

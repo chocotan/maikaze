@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
+
 /**
  * @author choco
  */
@@ -26,8 +27,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests().antMatchers("/image/**").permitAll()
+                .antMatchers("/kcs/**", "/kcsapi/**").hasRole("USER")
                 .and().formLogin().loginPage("/signin").defaultSuccessUrl("/").permitAll()
                 .and().logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll()
+
                 .and().csrf().ignoringAntMatchers("/admin/**", "/kcs/**", "/kcsapi/**");
 
         http.headers().frameOptions().disable().and()

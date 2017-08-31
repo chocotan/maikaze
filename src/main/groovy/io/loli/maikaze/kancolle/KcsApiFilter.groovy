@@ -6,11 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component
-import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.ReflectionUtils
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder
 
-import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpSession;
 
 @Component
@@ -37,13 +35,17 @@ public class KcsApiFilter extends ZuulFilter {
         return ctx.getRequest().getRequestURI().startsWith("/kcsapi/");
     }
 
+
+
+    @Autowired
+    LoginAndUserServerCache cache;
+
     @Override
     public Object run() {
-
-        def loginContext = session.getAttribute("lctx")
         RequestContext ctx = RequestContext.getCurrentContext();
+        def worldIp = cache.getServer(ctx.getRequest())
         try {
-            def worldUrl = "http://" + loginContext.$5_world_ip
+            def worldUrl = "http://" + worldIp
             URL url = UriComponentsBuilder.fromHttpUrl(worldUrl)
                     .build().toUri().toURL();
             ctx.setRouteHost(url);

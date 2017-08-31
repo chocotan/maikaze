@@ -130,6 +130,16 @@
             <groupId>org.thymeleaf.extras</groupId>
             <artifactId>thymeleaf-extras-springsecurity4</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>jcache</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>3.4.0</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

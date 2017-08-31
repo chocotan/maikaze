@@ -52,10 +52,13 @@ public class KcsProxyHostRoutingFilter extends SimpleHostRoutingFilter {
     @Autowired
     private HttpSession session;
 
+    @Autowired
+    LoginAndUserServerCache cache;
+
     @Override
     protected void preProcessHeader(MultiValueMap<String, String> headers, HttpServletRequest request) {
-        def loginContext = session.getAttribute("lctx")
-        String ip = loginContext.$5_world_ip
+        def worldIp = cache.getServer(request)
+        String ip = worldIp
         headers.set("Origin", "http://$ip/");
         headers.set('X-Requested-With', 'ShockwaveFlash/18.0.0.232')
         def referer = request.getHeader("Referer") ? request.getHeader("Referer") : "http://www.dmm.com/netgame/social/-/gadgets/=/app_id=854854/"
@@ -70,8 +73,8 @@ public class KcsProxyHostRoutingFilter extends SimpleHostRoutingFilter {
                     .mapToObj({ String.format("%03d", it) })
                     .collect(Collectors.joining("_"))
 
-            def loginContext = session.getAttribute("lctx")
-            String ip = loginContext.$5_world_ip
+            def worldIp = cache.getServer(request)
+            String ip = worldIp
             def newUrl = Arrays.stream(ip.split("\\.")).mapToInt({ Integer.parseInt(it) })
                     .mapToObj({ String.format("%03d", it) })
                     .collect(Collectors.joining("_"))

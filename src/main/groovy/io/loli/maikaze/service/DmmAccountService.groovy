@@ -1,12 +1,9 @@
 package io.loli.maikaze.service
 
-import com.github.benmanes.caffeine.cache.Cache
-import com.github.benmanes.caffeine.cache.Caffeine
 import io.loli.maikaze.domains.DmmAccount
 import io.loli.maikaze.domains.User
 import io.loli.maikaze.kancolle.KancolleProperties
-import io.loli.maikaze.kancolle.LoginContext
-import io.loli.maikaze.kancolle.LoginContextCache
+import io.loli.maikaze.kancolle.LoginAndUserServerCache
 import io.loli.maikaze.repository.DmmAccountRepository
 import javaslang.Tuple3
 import org.springframework.beans.factory.annotation.Autowired
@@ -39,8 +36,9 @@ class DmmAccountService {
     }
 
 
-    private static Cache<String, LoginContext> contextCache = Caffeine.newInstance()
-            .build();
+    def findAllAccount(){
+        repository.findAll()
+    }
 
 
     @Autowired
@@ -50,19 +48,25 @@ class DmmAccountService {
     HttpSession session;
 
     @Autowired
-    LoginContextCache loginContextCache
+    LoginAndUserServerCache loginContextCache
 
+
+    // 登录指定ip的舰娘账号，并将登录结果放在session中
     def login(Long id) {
         def account = findById(id)
         def lctx = loginContextCache.get(id, session);
-        session.setAttribute("lctx", lctx)
+        session.setAttribute("lctx_$id", lctx)
         lctx.user_agent = session.getAttribute "UA"
         lctx.reset(account.username, account.password)
         def flashUrl = lctx.startLogin();
         account.token = lctx.$6_api_token
         account.startTime = lctx.$6_api_starttime
         account.lastLogin = new Date()
+        account.serverIp = lctx.$5_world_ip
         save(account)
-        Tuple3.of flashUrl.replace("http://" + lctx.$5_world_ip, ""), lctx.$6_api_token, lctx.$6_api_starttime
+        loginContextCache.putServer(account.user.id, account.token, lctx.$5_world_ip)
+        def finalFlashUrl = flashUrl.replace("http://" + lctx.$5_world_ip, "")
+        lctx.finalFlashUrl = finalFlashUrl
+        Tuple3.of finalFlashUrl, lctx.$6_api_token, lctx.$6_api_starttime
     }
 }
