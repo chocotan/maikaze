@@ -24,4 +24,12 @@ class DmmAccountService {
     def findByUser(User user) {
         repository.findByUser user
     }
+
+    def findById(Long id) {
+        repository.findById id
+    }
+
+    def deleteById(Long id) {
+        repository.delete(id)
+    }
 }

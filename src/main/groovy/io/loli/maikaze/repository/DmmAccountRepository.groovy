@@ -9,4 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository
  */
 interface DmmAccountRepository extends JpaRepository<DmmAccount, Long> {
     List<DmmAccount> findByUser(User user)
+
+    DmmAccount findById(Long id)
 }

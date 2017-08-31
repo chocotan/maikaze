@@ -8,14 +8,38 @@
 <body>
 
 <div class="content" layout:fragment="content">
-    账号列表
 
-    <table>
-        <tr th:each="account: ${list}">
-            <td th:text="${account.username}"></td>
-        </tr>
+    <div class="main">
 
-    </table>
+
+        <div class="accounts">
+            <div class="page-header">
+                <h2 th:text="账号列表"></h2>
+            </div>
+            <a th:href="@{/account/add}" th:text="添加" class="btn btn-default"></a>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>用户名</th>
+                    <th>密码</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="account: ${list}">
+                    <td th:text="${account.username}"></td>
+                    <td th:text="'******'"></td>
+                    <td>
+                        <a>登录</a>
+                        <a th:href="@{/account/edit(id=${account.id})}">编辑</a>
+                        <a th:href="@{/account/delete(id=${account.id})}"> 删除</a>
+                    </td>
+                </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </div>
 </div>
 </body>
 </html>

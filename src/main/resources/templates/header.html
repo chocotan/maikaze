@@ -3,7 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 <body>
 <div class="header" th:fragment="header">
-    <nav id="top" class="navbar navbar-default navbar-static-top  navbar-fixed-top" role="navigation">
+    <nav id="top" class="navbar navbar-default navbar-static-top" role="navigation">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse"
@@ -21,7 +21,7 @@
                     <li sec:authorize="hasRole('USER')">
                         <a href="#" class="title dropdown-toggle" data-toggle="dropdown"><span sec:authentication="principal.email" th:remove="tag"></span><b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            <li><a th:href="@{/user/images}" th:text="#{myImages}"></a></li>
+                            <li><a th:href="@{/account/list}" th:text="我的DMM账号"></a></li>
                             <li><a th:href="@{/logout}" th:text="#{logout}"></a></li>
                         </ul>
                     </li>

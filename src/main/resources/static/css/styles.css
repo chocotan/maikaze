@@ -1,6 +1,5 @@
 .footer {
     background-color: rgb(245, 245, 245);
-    position: fixed;
     font-size: 1em;
     bottom: 0;
     left: 0;
@@ -16,19 +15,19 @@
     overflow: auto;
     top: 50px;
     position: absolute;
-    bottom: 5em;
     padding-left: 16px;
     padding-right: 16px;
     padding-top: 16px;
-    position: absolute;
     width: 100%;
     bottom: 80px;
 }
 
 
-
-body {
-
+.accounts{
+    margin: 20px auto auto auto;
+    width: 80%;
+    min-width: 500px;
+    max-width: 900px;
 }
 
 
@@ -40,25 +39,23 @@ body {
 #top {
     z-index: 1;
 }
-
-
-
-
-.login {
-    display: block;
-    margin-top: 130px;
+.main{
+    margin-top: 30px;
 }
 
-.login-form {
+
+
+.login{
+    display: block;
+
+}
+
+.login-form,.main-form {
     width: 50%;
     min-width: 500px;
     max-width: 800px;
     margin: auto;
 }
-
-
-
-
 
 a.disabled {
     pointer-events: none;
@@ -68,5 +65,3 @@ a.disabled {
 .page{
     padding-bottom: 100px;
 }
-
-/*images page end*/

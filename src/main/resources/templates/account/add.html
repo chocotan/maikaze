@@ -3,21 +3,23 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorator="layout">
 <head>
-    <title><span th:utext="#{account.add.title}" th:remove="tag"></span></title>
+    <title><span th:utext="DMM账号" th:remove="tag"></span></title>
 </head>
 <body>
 
 <div class="content" layout:fragment="content">
-    <div class="login">
-        <form class="form-horizontal login-form" th:action="@{/account/add}" method="post">
+    <div class="main">
+        <form class="form-horizontal main-form" th:action="@{/account/update}" method="post" th:object="${dmmAccount}">
             <div class="page-header">
-                <h2 th:text="添加DMM账号"></h2>
+                <h2 th:text="编辑DMM账号" th:if="${dmmAccount.id!=null}"></h2>
+                <h2 th:text="添加DMM账号" th:if="${dmmAccount.id==null}"></h2>
             </div>
+            <input th:type="hidden" th:field="*{id}"/>
             <div class="form-group">
-                <label for="inputEmail3" class="col-sm-2 control-label">Email</label>
+                <label for="inputEmail3" class="col-sm-2 control-label">用户名</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="inputEmail3" name="username" placeholder="DMM账号"
-                           required="required"/>
+                    <input type="text" class="form-control" id="inputEmail3" name="username" placeholder="DMM用户名"
+                           required="required"  th:field="*{username}"/>
                 </div>
             </div>
             <div class="form-group">
@@ -25,12 +27,13 @@
                 <div class="col-sm-10">
                     <input type="password" class="form-control" name="password" id="inputPassword"
                            th:placeholder="密码"
-                           required="required"/>
+                           required="required"  th:field="*{password}"/>
                 </div>
             </div>
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
-                    <button type="submit" class="btn btn-default" th:text="添加"></button>
+                    <button type="submit" class="btn btn-default" th:text="提交"></button>
+                    <a th:href="@{/account/list}" class="btn btn-default" th:text="返回"></a>
                 </div>
             </div>
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
+import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 
@@ -24,19 +25,37 @@ class AccountController {
     DmmAccountService dmmAccountService;
 
     @RequestMapping(value = "add", method = RequestMethod.GET)
-    def add() {
+    def add(@ModelAttribute DmmAccount dmmAccount) {
         "account/add"
+    }
+
+    @RequestMapping(value = "login", method = RequestMethod.GET)
+    def login(Long id) {
+
+    }
+
+    @RequestMapping(value = "edit", method = RequestMethod.GET)
+    def edit(Long id, Model model) {
+        model.addAttribute "dmmAccount", dmmAccountService.findById(id)
+        "account/add"
+    }
+
+    @RequestMapping(value = "delete", method = RequestMethod.GET)
+    def delete(Long id, Model model) {
+        dmmAccountService.deleteById(id)
+        "redirect:list"
     }
 
     @RequestMapping(value = "list", method = RequestMethod.GET)
     def list(Model model, Principal principal) {
-        model.addAttribute ("list", dmmAccountService.findByUser(principal.principal.user));
+        model.addAttribute("list", dmmAccountService.findByUser(principal.principal.user));
         "account/list";
     }
 
-    @RequestMapping(value = "add", method = RequestMethod.POST)
-    def addSubmit(String username, String password, Principal principal) {
-        dmmAccountService.save(new DmmAccount(username: username, password: password, user: principal.principal.user))
+    @RequestMapping(value = "update", method = RequestMethod.POST)
+    def updateSubmit(@ModelAttribute DmmAccount dmmAccount, Principal principal) {
+        dmmAccount.user = principal.principal.user;
+        dmmAccountService.save(dmmAccount)
         "redirect:list"
     }
 }
