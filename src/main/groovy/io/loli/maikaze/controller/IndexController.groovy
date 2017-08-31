@@ -5,12 +5,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@PreAuthorize("hasRole('USER')")
 public class IndexController {
 
     @RequestMapping("/")
 
-    @PreAuthorize("hasRole('USER')")
     public String index() {
-        return "index";
+        return "redirect:/account/list";
     }
 }

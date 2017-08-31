@@ -4,12 +4,7 @@ import com.alibaba.fastjson.JSON
 import io.loli.maikaze.utils.HttpClientUtil
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Scope
-import org.springframework.context.annotation.ScopedProxyMode
-import org.springframework.stereotype.Component
 import org.springframework.web.util.UriComponentsBuilder
-
 /**
  * Created by chocotan on 2017/8/20.
  */
@@ -60,9 +55,10 @@ public class LoginContext {
 
 
     def startLogin() {
-        loginToken()
-        ajaxGetToken()
-        login()
+        if(!loginToken()){
+            ajaxGetToken()
+            login()
+        }
         getUserIdFromIframeUrl()
         getServerIpWithUserId()
         getGameTokenWithServerIp()
@@ -73,11 +69,16 @@ public class LoginContext {
         def start = System.currentTimeMillis();
         def loginPageResult = httpClientUtil.get(properties.loginUrl, null, properties.loginTokenHeaders);
         $1_html = loginPageResult
+        // 不包含这个的时候说明不需要登陆了，直接打开游戏页面
+        if(!loginPageResult.contains("DMM_TOKEN")){
+            return true;
+        }
         def dmmToken = (loginPageResult =~ /"DMM_TOKEN", "(.+)(?=")/)[0][1]
         def token = (loginPageResult =~ /"token": "(.+)(?=")/)[0][1]
         $1_dmm_token = dmmToken
         $1_token = token
         logger.info("GET_TOKEN:DMM_TOKEN=$dmmToken,TOKEN=$token,COST={}", (System.currentTimeMillis() - start))
+        return false;
     }
 
 

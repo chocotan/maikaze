@@ -22,6 +22,7 @@
                 <tr>
                     <th>用户名</th>
                     <th>密码</th>
+                    <th>上次登陆时间</th>
                     <th>操作</th>
                 </tr>
                 </thead>
@@ -29,8 +30,10 @@
                 <tr th:each="account: ${list}">
                     <td th:text="${account.username}"></td>
                     <td th:text="'******'"></td>
+                    <td th:text="${account.lastLogin}"></td>
                     <td>
-                        <a>登录</a>
+                        <a th:href="@{/account/login(id=${account.id})}">登录</a>
+                        <a>进入游戏</a>
                         <a th:href="@{/account/edit(id=${account.id})}">编辑</a>
                         <a th:href="@{/account/delete(id=${account.id})}"> 删除</a>
                     </td>

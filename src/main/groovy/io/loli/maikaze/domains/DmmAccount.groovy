@@ -17,6 +17,9 @@ class DmmAccount {
     Long id;
     String username;
     String password;
+    Date lastLogin;
+    String token;
+    String startTime;
     @ManyToOne
     @JoinColumn(name = "user_id")
     User user;

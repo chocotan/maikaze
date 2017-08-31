@@ -55,7 +55,7 @@ kancolle:
   get-world-url: http://203.104.209.7/kcsapi/api_world/get_id/%s/1/%d
   get-flash-url: http://%s/kcsapi/api_auth_member/dmmlogin/%s/1/%d
   main-flash-url: http://%s/kcs/mainD2.swf?api_token=%s&api_starttime=%s
-  proxy: true
+  proxy: flase
   proxy-ip: localhost
   proxy-port: 1080
   proxy-type: HTTP
