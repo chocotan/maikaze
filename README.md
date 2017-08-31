@@ -27,6 +27,6 @@ kancolle.proxy-type: HTTP
 java -jar target/maikaze-0.0.1-SNAPSHOT.jar --server.port=8888
 ```
 
+
 ## 其他
-1. 有空会把文件缓存加上，省去配置nginx
-2. 如果想搭多节点共享session，可以用spring-session，另外数据库目前用的是h2，需要换成mysql，具体请参考spring-boot文档
+1. 暂无
