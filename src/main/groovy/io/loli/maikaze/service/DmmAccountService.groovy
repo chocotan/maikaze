@@ -63,10 +63,12 @@ class DmmAccountService {
         account.startTime = lctx.$6_api_starttime
         account.lastLogin = new Date()
         account.serverIp = lctx.$5_world_ip
-        save(account)
-        loginContextCache.putServer(account.user.id, account.token, lctx.$5_world_ip)
         def finalFlashUrl = flashUrl.replace("http://" + lctx.$5_world_ip, "")
         lctx.finalFlashUrl = finalFlashUrl
+        account.lastFlashUrl = finalFlashUrl
+        save(account)
+        loginContextCache.putServer(account.user.id, account.token, lctx.$5_world_ip)
+
         Tuple3.of finalFlashUrl, lctx.$6_api_token, lctx.$6_api_starttime
     }
 }

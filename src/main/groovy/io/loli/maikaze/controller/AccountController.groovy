@@ -51,8 +51,8 @@ class AccountController {
     @RequestMapping(value = "game", method = RequestMethod.GET)
     def game(Long id, Model model, Principal principal, HttpSession session) {
         try {
-            def dmm = session.getAttribute("lctx_$id")
-            model.addAttribute "flash", dmm.finalFlashUrl
+
+            model.addAttribute "flash", dmmAccountService.findById(id).lastFlashUrl
             "account/game"
         } catch (Exception e) {
             logger.error("登录发生错误了, {}", ExceptionUtils.getStackTrace(e))

@@ -24,4 +24,5 @@ class DmmAccount {
     @JoinColumn(name = "user_id")
     User user;
     String serverIp;
+    String lastFlashUrl;
 }
