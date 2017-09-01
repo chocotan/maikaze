@@ -9,7 +9,7 @@ mvn clean package
 java -jar target/maikaze-0.0.1-SNAPSHOT.jar
 ```
 ## 配置
-配置都在application.yml里，请修改完再编译打包，也添加到启动参数中
+配置都在application.yml里，请修改完再编译打包，也可以添加到启动参数中
 
 ```yaml
 // 端口号
