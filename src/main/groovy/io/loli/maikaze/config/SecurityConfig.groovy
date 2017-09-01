@@ -34,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and().csrf().ignoringAntMatchers("/admin/**", "/kcs/**", "/kcsapi/**");
 
-        http.headers().frameOptions().disable().and()
+        http.headers().disable()
                 .rememberMe().tokenRepository(reMemberMeRepository);
     }
 

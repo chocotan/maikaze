@@ -1,3 +1,4 @@
+
 server:
   port: 80
   session:
@@ -25,6 +26,8 @@ spring:
 
   thymeleaf:
     cache: false
+  application:
+    name: Maikaze
 kancolle:
   server-list:
      - 203.104.209.71
@@ -70,7 +73,9 @@ zuul:
       path: /kcs/**
       url: http://localhost:10000/
   host:
-    connect-timeout-millis: 20000
-    socket-timeout-millis: 20000
+    connect-timeout-millis: 120000
+    socket-timeout-millis: 120000
+    max-per-route-connections: 1000
+    max-total-connections: 2000
 logging:
   file: ${java.io.tmpdir}/logs/maikaze.log
