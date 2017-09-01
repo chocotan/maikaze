@@ -24,7 +24,3 @@ kancolle.proxy-port: 1080
 // 代理类型，支持HTTP、HTTPS、SOCKS
 kancolle.proxy-type: HTTP
 ```
-
-
-# TODO
-1. 修改Referer为flashurl
