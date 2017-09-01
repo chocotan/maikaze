@@ -61,6 +61,7 @@ public class KcsProxyHostRoutingFilter extends SimpleHostRoutingFilter {
         String ip = worldIp
         headers.set("Origin", "http://$ip/");
         headers.set('X-Requested-With', 'ShockwaveFlash/18.0.0.232')
+        // TODO flash header修改为flash的url
         def referer = request.getHeader("Referer") ? request.getHeader("Referer") : "http://www.dmm.com/netgame/social/-/gadgets/=/app_id=854854/"
         headers.set("Referer", referer.replace(request.getRemoteHost(), ip).replace("https", "http"))
         headers.remove("Cookie")
@@ -80,8 +81,6 @@ public class KcsProxyHostRoutingFilter extends SimpleHostRoutingFilter {
                     .collect(Collectors.joining("_"))
             return originUri.replace(toReplace, newUrl);
         }
-
-
         return super.preProcessUri(headers, request, originUri);
     }
 

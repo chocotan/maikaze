@@ -22,11 +22,11 @@ kancolle.proxy-port: 1080
 kancolle.proxy-type: HTTP
 ```
 
-端口默认为80，如果需要更改端口，在运行命令后面增加参数
+端口默认为80，如果需要更改端口，在运行命令后面增加参数，不过似乎端口设置非80会有问题？待验证
 ```
 java -jar target/maikaze-0.0.1-SNAPSHOT.jar --server.port=8888
 ```
 
 
-## TODO
-1. 缓存修改为@Cacheable
+# TODO
+1. 修改Referer为flashurl

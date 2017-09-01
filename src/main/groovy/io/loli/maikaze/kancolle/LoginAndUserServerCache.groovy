@@ -5,16 +5,12 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import io.loli.maikaze.service.DmmAccountService
 import io.loli.maikaze.utils.HttpClientUtil
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 
-import javax.annotation.PostConstruct
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpSession
-import java.util.stream.Collectors
-
 /**
  * Created by chocotan on 2017/8/22.
  */
@@ -24,35 +20,15 @@ class LoginAndUserServerCache {
     private static Cache<Long, DmmLogin> contextCache = Caffeine.newInstance()
             .build();
 
-
-    Cache<String, String> tokenAndServerCache = Caffeine.newInstance().build();
-
-    Map<Long, List<String>> userServers;
-
     @Autowired
     KancolleProperties kcp;
 
     @Autowired
     DmmAccountService dmmAccountService;
 
-    @PostConstruct
-    @Scheduled(fixedRate = 600000L)
-    def init() {
-        def list = dmmAccountService.findAllAccount().stream()
-                .filter({ it.token != null }).filter({it.serverIp!=null}).collect(Collectors.toList()
-        )
-
-        tokenAndServerCache.asMap().keySet().minus(list.stream().map({ it.token }).collect(Collectors.toList()))
-                .forEach({ tokenAndServerCache.invalidate(it) })
-        list.forEach({ tokenAndServerCache.put(it.token, it.serverIp) })
-
-        userServers = list.stream().filter({ it.token != null })
-                .collect(Collectors.groupingBy({ it.user.id }, Collectors.mapping({ it.serverIp }, Collectors.toList())))
-    }
-
 
     def getServer(String token) {
-        tokenAndServerCache.getIfPresent(token)
+        dmmAccountService.findByApiToken(token).serverIp
     }
 
 
@@ -66,15 +42,8 @@ class LoginAndUserServerCache {
             getServer(apiToken)
         } else {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            def id = authentication.principal.id
-            userServers.get(id).stream().findFirst().get()
+            dmmAccountService.findServerByUser(authentication.principal.user)
         }
-    }
-
-    def putServer(Long userId, String token, String server) {
-        def servers = userServers.computeIfAbsent(userId, { new ArrayList<>() })
-        servers.add(server)
-        tokenAndServerCache.put(token, server)
     }
 
 
@@ -90,5 +59,4 @@ class LoginAndUserServerCache {
             new DmmLogin(properties: kcp, httpClientUtil: httpClientUtil)
         })
     }
-
 }
