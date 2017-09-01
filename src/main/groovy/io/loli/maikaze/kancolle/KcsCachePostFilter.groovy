@@ -31,7 +31,7 @@ public class KcsCachePostFilter extends ZuulFilter {
         RequestContext ctx = RequestContext.getCurrentContext();
         def url = ctx.getRequest().getRequestURI()
         (!ctx.getBoolean("CACHE_HIT")) && (url.matches(".*/scenes/.+swf(\\?(VERSION|version)=.+)?") ||
-                url.matches(".*/kcs/sound/.*")||
+                url.matches(".*/kcs/sound/.*") ||
                 url.matches(".*/kcs/resources/.*"))
     }
 
@@ -42,14 +42,16 @@ public class KcsCachePostFilter extends ZuulFilter {
     @Override
     Object run() {
         RequestContext ctx = RequestContext.getCurrentContext();
-        def ba = IOUtils.toByteArray(ctx.getResponseDataStream());
-        ctx.setResponseDataStream(new ByteArrayInputStream(ba))
-        Map<String, String> headers = ctx.getOriginResponseHeaders().stream()
-                .collect(Collectors.toMap({ it.first() },
-                { it.second() })
-        )
-        kcsCacheUtil.put(ctx.getRequest().getRequestURI(), new KcsCacheObject(bytes: ba, headers: headers))
-
+        def code = ctx.getResponseStatusCode()
+        if (code > 199 && code < 400) {
+            def ba = IOUtils.toByteArray(ctx.getResponseDataStream());
+            ctx.setResponseDataStream(new ByteArrayInputStream(ba))
+            Map<String, String> headers = ctx.getOriginResponseHeaders().stream()
+                    .collect(Collectors.toMap({ it.first() },
+                    { it.second() })
+            )
+            kcsCacheUtil.put(ctx.getRequest().getRequestURI(), new KcsCacheObject(bytes: ba, headers: headers))
+        }
         return null
 
     }
