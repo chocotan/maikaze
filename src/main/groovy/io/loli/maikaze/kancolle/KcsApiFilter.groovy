@@ -38,12 +38,12 @@ public class KcsApiFilter extends ZuulFilter {
 
 
     @Autowired
-    LoginAndUserServerCache cache;
+    DmmLoginUserHelper helper;
 
     @Override
     public Object run() {
         RequestContext ctx = RequestContext.getCurrentContext();
-        def worldIp = cache.getServer(ctx.getRequest())
+        def worldIp = helper.getServer(ctx.getRequest())
         try {
             def worldUrl = "http://" + worldIp
             URL url = UriComponentsBuilder.fromHttpUrl(worldUrl)

@@ -39,6 +39,11 @@ public class KcsCachePostFilter extends ZuulFilter {
     @Autowired
     KcsCacheService kcsCacheUtil;
 
+
+    @Autowired
+    DmmLoginUserHelper helper;
+
+
     @Override
     Object run() {
         RequestContext ctx = RequestContext.getCurrentContext();
@@ -50,7 +55,9 @@ public class KcsCachePostFilter extends ZuulFilter {
                     .collect(Collectors.toMap({ it.first() },
                     { it.second() })
             )
-            kcsCacheUtil.put(ctx.getRequest().getRequestURI(), new KcsCacheObject(bytes: ba, headers: headers))
+
+            def url = helper.getRouteUrl(ctx.getRequest())
+            kcsCacheUtil.put(url, new KcsCacheObject(bytes: ba, headers: headers))
         }
         return null
 

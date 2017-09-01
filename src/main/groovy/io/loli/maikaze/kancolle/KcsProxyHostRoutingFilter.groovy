@@ -58,14 +58,13 @@ public class KcsProxyHostRoutingFilter extends SimpleHostRoutingFilter {
     private HttpSession session;
 
     @Autowired
-    LoginAndUserServerCache cache;
+    DmmLoginUserHelper helper;
 
     @Override
     protected void preProcessHeader(MultiValueMap<String, String> headers, HttpServletRequest request) {
-        def worldIp = cache.getServer(request)
+        def worldIp = helper.getServer(request)
 
         headers.set('X-Requested-With', request.getHeader("X-requested-With") ?: "ShockwaveFlash/26.0.0.151");
-        // TODO flash header修改为flash的url
         def referer = request.getHeader("Referer")
         if(referer&&request.getRequestURI().contains("/kcsapi/")){
             headers.set("Origin", "http://$worldIp/");
@@ -80,7 +79,7 @@ public class KcsProxyHostRoutingFilter extends SimpleHostRoutingFilter {
     protected String preProcessUri(MultiValueMap<String, String> headers, HttpServletRequest request, String originUri) {
 
         if (originUri.contains("/kcs/resources/image/world/") && originUri.endsWith(".png")) {
-            def worldIp = cache.getServer(request)
+            def worldIp = helper.getServer(request)
             String ip = worldIp
             def newUrl = Arrays.stream(ip.split("\\.")).mapToInt({ Integer.parseInt(it) })
                     .mapToObj({ String.format("%03d", it) })

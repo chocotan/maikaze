@@ -2,7 +2,7 @@ package io.loli.maikaze.controller
 
 import io.loli.maikaze.domains.DmmAccount
 import io.loli.maikaze.kancolle.KancolleProperties
-import io.loli.maikaze.kancolle.LoginAndUserServerCache
+import io.loli.maikaze.kancolle.DmmLoginUserHelper
 import io.loli.maikaze.service.DmmAccountService
 import javaslang.Tuple3
 import org.apache.commons.lang3.exception.ExceptionUtils
@@ -91,7 +91,7 @@ class AccountController {
     HttpSession session;
 
     @Autowired
-    LoginAndUserServerCache loginContextCache
+    DmmLoginUserHelper loginContextCache
 
     def dmmLogin(Long id, HttpServletRequest request) {
         // 登录指定ip的舰娘账号，并将登录结果放在session中
