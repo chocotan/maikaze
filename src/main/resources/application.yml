@@ -72,3 +72,5 @@ zuul:
   host:
     connect-timeout-millis: 20000
     socket-timeout-millis: 20000
+logging:
+  file: ${java.io.tmpdir}/logs/maikaze.log
