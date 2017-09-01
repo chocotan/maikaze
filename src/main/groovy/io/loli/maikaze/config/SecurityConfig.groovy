@@ -28,7 +28,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests().antMatchers("/image/**").permitAll()
                 .antMatchers("/kcs/**", "/kcsapi/**").hasRole("USER")
-                .and().formLogin().loginPage("/signin").defaultSuccessUrl("/").permitAll()
+                .and().formLogin().loginPage("/signin").successHandler().defaultSuccessUrl("/").permitAll()
+
                 .and().logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll()
 
                 .and().csrf().ignoringAntMatchers("/admin/**", "/kcs/**", "/kcsapi/**");

@@ -11,4 +11,6 @@ interface DmmAccountRepository extends JpaRepository<DmmAccount, Long> {
     List<DmmAccount> findByUser(User user)
 
     DmmAccount findById(Long id)
+
+    DmmAccount findByToken(String apiToken)
 }

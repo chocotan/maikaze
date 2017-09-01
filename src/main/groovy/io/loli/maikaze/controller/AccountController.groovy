@@ -1,7 +1,10 @@
 package io.loli.maikaze.controller
 
 import io.loli.maikaze.domains.DmmAccount
+import io.loli.maikaze.kancolle.KancolleProperties
+import io.loli.maikaze.kancolle.LoginAndUserServerCache
 import io.loli.maikaze.service.DmmAccountService
+import javaslang.Tuple3
 import org.apache.commons.lang3.exception.ExceptionUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -37,7 +40,7 @@ class AccountController {
     @RequestMapping(value = "login", method = RequestMethod.GET)
     def login(Long id, Model model, Principal principal) {
         try {
-            def tuple = dmmAccountService.login(id)
+            def tuple = dmmLogin(id)
             def flash = tuple._1()
             model.addAttribute "flash", flash
             "account/game"
@@ -46,6 +49,34 @@ class AccountController {
             model.addAttribute "error", e.message
             list(model, principal)
         }
+    }
+
+
+    @Autowired
+    KancolleProperties kcp;
+
+    @Autowired
+    HttpSession session;
+
+    @Autowired
+    LoginAndUserServerCache loginContextCache
+
+    def dmmLogin(Long id) {
+        // 登录指定ip的舰娘账号，并将登录结果放在session中
+        def account = dmmAccountService.findById(id)
+        def lctx = loginContextCache.get(id, session);
+        session.setAttribute("lctx_$id", lctx)
+        lctx.user_agent = session.getAttribute "UA"
+        lctx.reset(account.username, account.password)
+        def flashUrl = lctx.startLogin();
+        account.token = lctx.$6_api_token
+        account.startTime = lctx.$6_api_starttime
+        account.lastLogin = new Date()
+        account.serverIp = lctx.$5_world_ip
+        dmmAccountService.save(account)
+        def finalFlashUrl = flashUrl.replace("http://" + lctx.$5_world_ip, "")
+        lctx.finalFlashUrl = finalFlashUrl
+        Tuple3.of finalFlashUrl, lctx.$6_api_token, lctx.$6_api_starttime
     }
 
     @RequestMapping(value = "game", method = RequestMethod.GET)
