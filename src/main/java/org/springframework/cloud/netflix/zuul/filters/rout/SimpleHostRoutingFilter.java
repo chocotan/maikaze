@@ -35,8 +35,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
@@ -67,6 +65,8 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
 import org.apache.http.protocol.HttpContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cloud.context.environment.EnvironmentChangeEvent;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
@@ -95,7 +95,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
  */
 public class SimpleHostRoutingFilter extends ZuulFilter {
 
-    private static final Log log = LogFactory.getLog(SimpleHostRoutingFilter.class);
+    private static final Logger log = LoggerFactory.getLogger(SimpleHostRoutingFilter.class);
 
     private final Timer connectionManagerTimer = new Timer(
             "SimpleHostRoutingFilter.connectionManagerTimer", true);
@@ -192,6 +192,7 @@ public class SimpleHostRoutingFilter extends ZuulFilter {
 
         preProcessHeader(headers, request);
         uri = preProcessUri(headers, request, uri);
+        log.debug("routing request to {}", uri);
         try {
             CloseableHttpResponse response = forward(this.httpClient, verb, uri, request,
                     headers, params, requestEntity);

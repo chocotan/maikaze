@@ -19,7 +19,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 @Component
 public class KcsImgFilter extends ZuulFilter {
 
-    private static Logger log = LoggerFactory.getLogger(KcsApiFilter.class);
+    private static Logger log = LoggerFactory.getLogger(KcsImgFilter.class);
 
     @Autowired
     private HttpSession session;
@@ -38,6 +38,7 @@ public class KcsImgFilter extends ZuulFilter {
     @Override
     public boolean shouldFilter() {
         RequestContext ctx = RequestContext.getCurrentContext();
+
         return ctx.getRequest().getRequestURI().startsWith("/kcs/");
     }
     @Autowired
@@ -52,6 +53,7 @@ public class KcsImgFilter extends ZuulFilter {
             def worldUrl = "http://" + worldIp
             URL url = UriComponentsBuilder.fromHttpUrl(worldUrl)
                     .build().toUri().toURL();
+            log.debug(ctx.getRequest().getRequestURI() + "^^" + url.toString())
             ctx.setRouteHost(url);
         } catch (Exception e) {
             ReflectionUtils.rethrowRuntimeException(e);

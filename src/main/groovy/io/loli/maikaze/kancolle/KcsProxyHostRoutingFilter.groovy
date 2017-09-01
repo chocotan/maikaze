@@ -1,6 +1,5 @@
 package io.loli.maikaze.kancolle
 
-import com.sun.media.jfxmedia.logging.Logger
 import org.apache.http.config.Registry
 import org.apache.http.config.RegistryBuilder
 import org.apache.http.conn.socket.ConnectionSocketFactory
@@ -9,6 +8,8 @@ import org.apache.http.conn.ssl.NoopHostnameVerifier
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
 import org.apache.http.protocol.HttpContext
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties
@@ -37,6 +38,8 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 public class KcsProxyHostRoutingFilter extends SimpleHostRoutingFilter {
 
     private KancolleProperties kancolleProperties;
+
+    static final Logger logger = LoggerFactory.getLogger(KcsProxyHostRoutingFilter)
 
     @Override
     public int filterOrder() {
@@ -75,6 +78,7 @@ public class KcsProxyHostRoutingFilter extends SimpleHostRoutingFilter {
     }
 
     protected String preProcessUri(MultiValueMap<String, String> headers, HttpServletRequest request, String originUri) {
+
         if (originUri.contains("/kcs/resources/image/world/") && originUri.endsWith(".png")) {
             def worldIp = cache.getServer(request)
             String ip = worldIp
@@ -82,7 +86,6 @@ public class KcsProxyHostRoutingFilter extends SimpleHostRoutingFilter {
                     .mapToObj({ String.format("%03d", it) })
                     .collect(Collectors.joining("_"))
             def nu = originUri.replaceAll("/kcs/resources/image/world/.+", "/kcs/resources/image/world/" + newUrl + "_t.png")
-            Logger.INFO "$nu"
             return nu;
         }
         return super.preProcessUri(headers, request, originUri);
