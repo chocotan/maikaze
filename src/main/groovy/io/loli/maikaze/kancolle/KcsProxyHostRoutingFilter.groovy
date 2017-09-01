@@ -74,18 +74,13 @@ public class KcsProxyHostRoutingFilter extends SimpleHostRoutingFilter {
     }
 
     protected String preProcessUri(MultiValueMap<String, String> headers, HttpServletRequest request, String originUri) {
-        if (originUri.contains("kcs/resources/image/world/") && originUri.endsWith(".png")) {
-            def host = request.getRemoteHost();
-            def toReplace = Arrays.stream(host.split("\\.")).mapToInt({ Integer.parseInt(it) })
-                    .mapToObj({ String.format("%03d", it) })
-                    .collect(Collectors.joining("_"))
-
+        if (originUri.contains("/kcs/resources/image/world/") && originUri.endsWith(".png")) {
             def worldIp = cache.getServer(request)
             String ip = worldIp
             def newUrl = Arrays.stream(ip.split("\\.")).mapToInt({ Integer.parseInt(it) })
                     .mapToObj({ String.format("%03d", it) })
                     .collect(Collectors.joining("_"))
-            return originUri.replace(toReplace, newUrl);
+            return originUri.replaceAll("/kcs/resources/image/world/.+", "/kcs/resources/image/world/$newUrl_t.png");
         }
         return super.preProcessUri(headers, request, originUri);
     }
