@@ -9,9 +9,12 @@ mvn clean package
 java -jar target/maikaze-0.0.1-SNAPSHOT.jar
 ```
 ## 配置
-配置都在application.yml里，请修改完再编译打包
+配置都在application.yml里，请修改完再编译打包，也添加到启动参数中
 
 ```yaml
+// 端口号
+server.port: 80
+
 // 是否使用代理，如果直接跑在日本的服务器上，那么就不需要代理了
 kancolle.proxy: true
 // 代理IP
@@ -20,11 +23,6 @@ kancolle.proxy-ip: localhost
 kancolle.proxy-port: 1080
 // 代理类型，支持HTTP、HTTPS、SOCKS
 kancolle.proxy-type: HTTP
-```
-
-端口默认为80，如果需要更改端口，在运行命令后面增加参数，不过似乎端口设置非80会有问题？待验证
-```
-java -jar target/maikaze-0.0.1-SNAPSHOT.jar --server.port=8888
 ```
 
 
