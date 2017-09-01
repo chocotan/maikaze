@@ -80,7 +80,7 @@ public class KcsProxyHostRoutingFilter extends SimpleHostRoutingFilter {
             def newUrl = Arrays.stream(ip.split("\\.")).mapToInt({ Integer.parseInt(it) })
                     .mapToObj({ String.format("%03d", it) })
                     .collect(Collectors.joining("_"))
-            return originUri.replaceAll("/kcs/resources/image/world/.+", "/kcs/resources/image/world/$newUrl_t.png");
+            return originUri.replaceAll("/kcs/resources/image/world/.+", "/kcs/resources/image/world/"+newUrl+"_t.png");
         }
         return super.preProcessUri(headers, request, originUri);
     }
