@@ -33,9 +33,11 @@
                     <td th:text="${#dates.format(account.lastLogin)}" th:if="${account.lastLogin}"></td>
                     <td th:if="${account.lastLogin eq null}"></td>
                     <td>
-                        <a th:href="@{/account/login(id=${account.id})}">登录</a>
-                        <a th:href="@{/account/game(id=${account.id})}"
-                            th:if="${#httpSession.getAttribute('lctx_'+account.id)!=null}">直接进入游戏</a>
+                        <a th:href="@{/account/login(id=${account.id})}">登录(浏览器)</a>
+                        <a th:href="@{/account/login(id=${account.id},type='KCV')}">登录(KCV)</a>
+                        <a th:href="@{/account/login(id=${account.id},type='POI')}">登录(POI)</a>
+                        <!--<a th:href="@{/account/game(id=${account.id})}"-->
+                            <!--th:if="${#httpSession.getAttribute('lctx_'+account.id)!=null}">进入游戏(浏览器)</a>-->
                         <a th:href="@{/account/edit(id=${account.id})}">编辑</a>
                         <a th:href="@{/account/delete(id=${account.id})}"> 删除</a>
                     </td>

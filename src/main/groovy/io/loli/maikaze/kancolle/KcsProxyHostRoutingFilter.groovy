@@ -14,6 +14,7 @@ import org.springframework.cloud.netflix.zuul.filters.ZuulProperties
 import org.springframework.cloud.netflix.zuul.filters.rout.SimpleHostRoutingFilter
 import org.springframework.stereotype.Component
 import org.springframework.util.MultiValueMap
+import org.springframework.web.util.UriComponentsBuilder
 
 import javax.net.ssl.SSLContext
 import javax.net.ssl.X509TrustManager
@@ -58,12 +59,17 @@ public class KcsProxyHostRoutingFilter extends SimpleHostRoutingFilter {
     @Override
     protected void preProcessHeader(MultiValueMap<String, String> headers, HttpServletRequest request) {
         def worldIp = cache.getServer(request)
-        String ip = worldIp
-        headers.set("Origin", "http://$ip/");
-        headers.set('X-Requested-With', 'ShockwaveFlash/18.0.0.232')
+
+        headers.set('X-Requested-With', request.getHeader("X-requested-With") ?: "ShockwaveFlash/26.0.0.151");
         // TODO flash header修改为flash的url
-        def referer = request.getHeader("Referer") ? request.getHeader("Referer") : "http://www.dmm.com/netgame/social/-/gadgets/=/app_id=854854/"
-        headers.set("Referer", referer.replace(request.getRemoteHost(), ip).replace("https", "http"))
+        def referer = request.getHeader("Referer")
+        if(referer&&request.getRequestURI().contains("/kcsapi/")){
+            headers.set("Origin", "http://$worldIp/");
+            def replacedRef = UriComponentsBuilder.fromHttpUrl(referer).host(worldIp).port(80).scheme("http").build().toUriString()
+            headers.set("Referer", replacedRef.replace(":80/","/"))
+        }else{
+            headers.set("Referer", "http://www.dmm.com/netgame/social/-/gadgets/=/app_id=854854/")
+        }
         headers.remove("Cookie")
     }
 

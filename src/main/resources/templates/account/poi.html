@@ -1,0 +1,28 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title><span th:utext="舰队收藏-POI" th:remove="tag"></span></title>
+</head>
+<body>
+<div id="flashWrap" style="width: 100%; margin-left: auto; margin-right: auto; height: 100%">
+</div>
+<script th:src="@{/webjars/jquery/2.2.4/jquery.min.js}"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var flashUrl = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '') + [[${flash}]];
+    var obj = $("<embed></embed>");
+    obj.attr("id", "externalswf");
+    obj.attr("width", "100%");
+    obj.attr("height", "100%");
+    obj.attr("quality", "high");
+    obj.attr("wmode", "opaque");
+    obj.attr("bgcolor", "#000000");
+    obj.attr("allowscriptaccess", "always");
+    obj.attr("base", "/kcs/");
+    obj.attr("type", "application/x-shockwave-flash");
+    obj.attr("src", flashUrl);
+    $("#flashWrap").append(obj);
+    /*]]>*/
+</script>
+</body>
+</html>
