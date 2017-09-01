@@ -1,5 +1,6 @@
 package io.loli.maikaze.kancolle
 
+import com.sun.media.jfxmedia.logging.Logger
 import org.apache.http.config.Registry
 import org.apache.http.config.RegistryBuilder
 import org.apache.http.conn.socket.ConnectionSocketFactory
@@ -80,7 +81,9 @@ public class KcsProxyHostRoutingFilter extends SimpleHostRoutingFilter {
             def newUrl = Arrays.stream(ip.split("\\.")).mapToInt({ Integer.parseInt(it) })
                     .mapToObj({ String.format("%03d", it) })
                     .collect(Collectors.joining("_"))
-            return originUri.replaceAll("/kcs/resources/image/world/.+", "/kcs/resources/image/world/"+newUrl+"_t.png");
+            def nu = originUri.replaceAll("/kcs/resources/image/world/.+", "/kcs/resources/image/world/" + newUrl + "_t.png")
+            Logger.INFO "$nu"
+            return nu;
         }
         return super.preProcessUri(headers, request, originUri);
     }
