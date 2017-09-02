@@ -16,6 +16,7 @@
 
 package io.loli.maikaze.kancolle
 
+import com.google.common.io.ByteStreams
 import com.netflix.zuul.ZuulFilter
 import com.netflix.zuul.context.RequestContext
 import org.apache.http.*
@@ -29,6 +30,7 @@ import org.apache.http.conn.socket.ConnectionSocketFactory
 import org.apache.http.conn.socket.PlainConnectionSocketFactory
 import org.apache.http.conn.ssl.NoopHostnameVerifier
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
+import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.entity.ContentType
 import org.apache.http.entity.InputStreamEntity
 import org.apache.http.impl.client.CloseableHttpClient
@@ -138,7 +140,7 @@ public class CustomHostRoutingFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
-         RequestContext.getCurrentContext().getRouteHost() != null && RequestContext.getCurrentContext().sendZuulResponse() && (RequestContext.getCurrentContext().get("CACHE_HIT") != Boolean.TRUE);
+        RequestContext.getCurrentContext().getRouteHost() != null && RequestContext.getCurrentContext().sendZuulResponse() && (RequestContext.getCurrentContext().get("CACHE_HIT") != Boolean.TRUE);
     }
 
     @Override
@@ -208,7 +210,7 @@ public class CustomHostRoutingFilter extends ZuulFilter {
             }], new SecureRandom());
 
             RegistryBuilder<ConnectionSocketFactory> registryBuilder = RegistryBuilder
-                    .<ConnectionSocketFactory>create()
+                    .<ConnectionSocketFactory> create()
                     .register(HTTP_SCHEME, PlainConnectionSocketFactory.INSTANCE);
             if (this.sslHostnameValidationEnabled) {
                 registryBuilder.register(HTTPS_SCHEME,
@@ -246,20 +248,20 @@ public class CustomHostRoutingFilter extends ZuulFilter {
                 .useSystemProperties().setDefaultRequestConfig(requestConfig)
                 .setRetryHandler(new KancolleHttpRequestRetryHandler(5, false))
                 .setRedirectStrategy(new RedirectStrategy() {
-                    @Override
-                    public boolean isRedirected(HttpRequest request,
-                                                HttpResponse response, HttpContext context)
-                            throws ProtocolException {
-                        return false;
-                    }
+            @Override
+            public boolean isRedirected(HttpRequest request,
+                                        HttpResponse response, HttpContext context)
+                    throws ProtocolException {
+                return false;
+            }
 
-                    @Override
-                    public HttpUriRequest getRedirect(HttpRequest request,
-                                                      HttpResponse response, HttpContext context)
-                            throws ProtocolException {
-                        return null;
-                    }
-                }).build();
+            @Override
+            public HttpUriRequest getRedirect(HttpRequest request,
+                                              HttpResponse response, HttpContext context)
+                    throws ProtocolException {
+                return null;
+            }
+        }).build();
     }
 
     private CloseableHttpResponse forward(CloseableHttpClient httpclient, String verb,
@@ -279,7 +281,7 @@ public class CustomHostRoutingFilter extends ZuulFilter {
             contentType = ContentType.parse(request.getContentType());
         }
 
-        InputStreamEntity entity = new InputStreamEntity(requestEntity, contentLength, contentType);
+        ByteArrayEntity entity = new ByteArrayEntity(ByteStreams.toByteArray(requestEntity), contentType);
 
         HttpRequest httpRequest = buildHttpRequest(verb, uri, entity, headers, params, request);
         try {
@@ -299,7 +301,7 @@ public class CustomHostRoutingFilter extends ZuulFilter {
     }
 
     protected HttpRequest buildHttpRequest(String verb, String uri,
-                                           InputStreamEntity entity, MultiValueMap<String, String> headers,
+                                           HttpEntity entity, MultiValueMap<String, String> headers,
                                            MultiValueMap<String, String> params, HttpServletRequest request) {
         HttpRequest httpRequest;
         String uriWithQueryString = uri + (this.forceOriginalQueryStringEncoding
