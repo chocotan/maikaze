@@ -63,6 +63,7 @@ class DmmAccountService {
         repository.findById id
     }
 
-
-
+    boolean check(Long id, Long userId) {
+        repository.findById(id).user.id == userId
+    }
 }

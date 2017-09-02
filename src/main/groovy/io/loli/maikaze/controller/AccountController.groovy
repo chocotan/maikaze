@@ -43,6 +43,9 @@ class AccountController {
     def login(Long id,
               @RequestParam(defaultValue = "NONE") String type, Model model, Principal principal, HttpServletRequest request) {
         try {
+            if (!dmmAccountService.check(id, principal.principal.id)) {
+                throw new IllegalArgumentException("非法的请求")
+            }
             def tuple = dmmLogin(id, request)
             def flash = tuple._1()
             model.addAttribute "flash", flash
@@ -66,7 +69,9 @@ class AccountController {
     def game(Long id,
              @RequestParam(defaultValue = "NONE") String type, Model model, Principal principal, HttpSession session) {
         try {
-
+            if (!dmmAccountService.check(id, principal.user.id)) {
+                throw new IllegalArgumentException("非法的请求")
+            }
             model.addAttribute "flash", dmmAccountService.findById(id).lastFlashUrl
             model.addAttribute "type", type
             model.addAttribute "id", id
