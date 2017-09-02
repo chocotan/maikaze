@@ -20,7 +20,6 @@ import org.springframework.session.jdbc.config.annotation.web.http.EnableJdbcHtt
 @ServletComponentScan
 @EnableJpaRepositories
 @EnableScheduling
-@EnableJdbcHttpSession
 @EnableCaching
 class MaikazeApplication {
 
