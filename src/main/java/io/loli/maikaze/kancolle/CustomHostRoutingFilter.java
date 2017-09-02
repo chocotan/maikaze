@@ -277,7 +277,7 @@ public class CustomHostRoutingFilter extends ZuulFilter {
         return httpClientBuilder.setConnectionManager(newConnectionManager())
                 .disableContentCompression()
                 .useSystemProperties().setDefaultRequestConfig(requestConfig)
-                .setRetryHandler(new DefaultHttpRequestRetryHandler(5, false))
+                .setRetryHandler(new KancolleHttpRequestRetryHandler(5, false))
                 .setRedirectStrategy(new RedirectStrategy() {
                     @Override
                     public boolean isRedirected(HttpRequest request,
