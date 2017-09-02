@@ -77,5 +77,6 @@ zuul:
     socket-timeout-millis: 120000
     max-per-route-connections: 1000
     max-total-connections: 2000
+    time-to-live: 60000
 logging:
   file: ${java.io.tmpdir}/logs/maikaze.log

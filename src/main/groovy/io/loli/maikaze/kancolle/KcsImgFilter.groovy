@@ -38,7 +38,6 @@ public class KcsImgFilter extends ZuulFilter {
     @Override
     public boolean shouldFilter() {
         RequestContext ctx = RequestContext.getCurrentContext();
-
         return ctx.getRequest().getRequestURI().startsWith("/kcs/");
     }
     @Autowired

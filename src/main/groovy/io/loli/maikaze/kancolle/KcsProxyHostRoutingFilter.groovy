@@ -1,5 +1,6 @@
 package io.loli.maikaze.kancolle
 
+import com.netflix.zuul.context.RequestContext
 import org.apache.http.config.Registry
 import org.apache.http.config.RegistryBuilder
 import org.apache.http.conn.socket.ConnectionSocketFactory
@@ -76,6 +77,7 @@ public class KcsProxyHostRoutingFilter extends CustomHostRoutingFilter {
         } else {
             headers.set("Referer", "http://www.dmm.com/netgame/social/-/gadgets/=/app_id=854854/")
         }
+        headers.set("User-Agent", RequestContext.getCurrentContext().get("UA"))
         headers.remove("Cookie")
     }
 
