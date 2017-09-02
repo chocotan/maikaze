@@ -24,3 +24,8 @@ kancolle.proxy-port: 1080
 // 代理类型，支持HTTP、HTTPS、SOCKS
 kancolle.proxy-type: HTTP
 ```
+
+
+## 其他
+
+1. POI似乎不支持https，所以poi.html里的protocol写死的是http

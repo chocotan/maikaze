@@ -14,7 +14,9 @@
 <script th:src="@{/webjars/jquery/2.2.4/jquery.min.js}"></script>
 <script th:inline="javascript">
     /*<![CDATA[*/
-    var flashUrl = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '') + [[${flash}]];
+    // POI不支持https，所以这里强制写成http
+    var s = "http:" + '//' + location.hostname + (location.port ? ':' + location.port : '');
+    var flashUrl = s + [[${flash}]];
     var obj = $("<embed></embed>");
     obj.attr("id", "externalswf");
     obj.attr("width", "800");
@@ -23,7 +25,7 @@
     obj.attr("wmode", "opaque");
     obj.attr("bgcolor", "#000000");
     obj.attr("allowscriptaccess", "always");
-    obj.attr("base", "/kcs/");
+    obj.attr("base", s + "/kcs/");
     obj.attr("type", "application/x-shockwave-flash");
     obj.attr("src", flashUrl);
     $("#flashWrap").append(obj);
