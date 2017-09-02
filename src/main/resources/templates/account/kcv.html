@@ -1,14 +1,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorator="layout">
+      >
 <head>
     <title><span th:utext="舰队收藏" th:remove="tag"></span></title>
 
 
 </head>
 <body>
-<div class="content" layout:fragment="content">
+<div class="content" >
     <div class="main">
         <iframe id="game_frame" name="game_frame" th:src="@{/account/game(id=${id},type='POI')}" width="900" height="1200"
                 scrolling="no" frameborder="0" border="0" style="height: 610px;">艦隊これくしょん -艦これ-

@@ -50,6 +50,7 @@ class AccountController {
             def flash = tuple._1()
             model.addAttribute "flash", flash
             model.addAttribute "type", type
+            model.addAttribute "id", id
             if ("NONE" == type) {
                 "account/game"
             } else if ("POI" == type) {
@@ -69,7 +70,7 @@ class AccountController {
     def game(Long id,
              @RequestParam(defaultValue = "NONE") String type, Model model, Principal principal, HttpSession session) {
         try {
-            if (!dmmAccountService.check(id, principal.user.id)) {
+            if (!dmmAccountService.check(id, principal.principal.id)) {
                 throw new IllegalArgumentException("非法的请求")
             }
             model.addAttribute "flash", dmmAccountService.findById(id).lastFlashUrl
