@@ -12,6 +12,7 @@ import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper
 import org.springframework.context.annotation.Bean
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.scheduling.annotation.EnableScheduling
+import org.springframework.session.jdbc.config.annotation.web.http.EnableJdbcHttpSession
 
 @SpringBootApplication
 @EnableConfigurationProperties(KancolleProperties)
@@ -19,6 +20,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @ServletComponentScan
 @EnableJpaRepositories
 @EnableScheduling
+@EnableJdbcHttpSession
 @EnableCaching
 class MaikazeApplication {
 
