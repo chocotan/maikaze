@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.netflix.zuul.filters.rout;
+package io.loli.maikaze.kancolle;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -93,12 +93,12 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
  * @author Dave Syer
  * @author Bilal Alp
  */
-public class SimpleHostRoutingFilter extends ZuulFilter {
+public class CustomHostRoutingFilter extends ZuulFilter {
 
-    private static final Logger log = LoggerFactory.getLogger(SimpleHostRoutingFilter.class);
+    private static final Logger log = LoggerFactory.getLogger(CustomHostRoutingFilter.class);
 
     private final Timer connectionManagerTimer = new Timer(
-            "SimpleHostRoutingFilter.connectionManagerTimer", true);
+            "CustomHostRoutingFilter.connectionManagerTimer", true);
 
     protected boolean sslHostnameValidationEnabled;
     protected boolean forceOriginalQueryStringEncoding;
@@ -122,15 +122,15 @@ public class SimpleHostRoutingFilter extends ZuulFilter {
 
         if (createNewClient) {
             try {
-                SimpleHostRoutingFilter.this.httpClient.close();
+                CustomHostRoutingFilter.this.httpClient.close();
             } catch (IOException ex) {
                 log.error("error closing client", ex);
             }
-            SimpleHostRoutingFilter.this.httpClient = newClient();
+            CustomHostRoutingFilter.this.httpClient = newClient();
         }
     }
 
-    public SimpleHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties properties) {
+    public CustomHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties properties) {
         this.helper = helper;
         this.hostProperties = properties.getHost();
         this.sslHostnameValidationEnabled = properties.isSslHostnameValidationEnabled();
@@ -144,10 +144,10 @@ public class SimpleHostRoutingFilter extends ZuulFilter {
         this.connectionManagerTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (SimpleHostRoutingFilter.this.connectionManager == null) {
+                if (CustomHostRoutingFilter.this.connectionManager == null) {
                     return;
                 }
-                SimpleHostRoutingFilter.this.connectionManager.closeExpiredConnections();
+                CustomHostRoutingFilter.this.connectionManager.closeExpiredConnections();
             }
         }, 30000, 5000);
     }
@@ -201,7 +201,8 @@ public class SimpleHostRoutingFilter extends ZuulFilter {
             if (statusCode > 199 && statusCode < 400) {
                 context.set("ROUTE_RESULT", Boolean.TRUE);
             }
-            log.info("Request to {} received result {}", uri, statusCode);
+            log.info("Request to {} status {}", uri, statusCode);
+            setResponse(response);
         } catch (Exception ex) {
             log.error("Request failed {}", uri);
             throw new ZuulRuntimeException(ex);
@@ -276,7 +277,7 @@ public class SimpleHostRoutingFilter extends ZuulFilter {
         return httpClientBuilder.setConnectionManager(newConnectionManager())
                 .disableContentCompression()
                 .useSystemProperties().setDefaultRequestConfig(requestConfig)
-                .setRetryHandler(new DefaultHttpRequestRetryHandler(0, false))
+                .setRetryHandler(new DefaultHttpRequestRetryHandler(5, false))
                 .setRedirectStrategy(new RedirectStrategy() {
                     @Override
                     public boolean isRedirected(HttpRequest request,
