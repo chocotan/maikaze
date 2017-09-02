@@ -4,6 +4,7 @@ server:
   session:
     persistent: true
     store-dir: ${java.io.tmpdir}/maikaze
+    timeout: 7200000
 spring:
   output:
     ansi:
