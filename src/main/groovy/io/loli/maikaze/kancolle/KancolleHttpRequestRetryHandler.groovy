@@ -1,6 +1,7 @@
 package io.loli.maikaze.kancolle
 
 import org.apache.http.NoHttpResponseException
+import org.apache.http.impl.client.RequestWrapper
 
 import javax.net.ssl.SSLException;
 

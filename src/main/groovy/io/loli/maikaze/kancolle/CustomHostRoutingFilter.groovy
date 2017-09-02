@@ -14,85 +14,54 @@
  * limitations under the License.
  */
 
-package io.loli.maikaze.kancolle;
+package io.loli.maikaze.kancolle
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import com.netflix.zuul.ZuulFilter
+import com.netflix.zuul.context.RequestContext
+import org.apache.http.*
+import org.apache.http.client.RedirectStrategy
+import org.apache.http.client.config.CookieSpecs
+import org.apache.http.client.config.RequestConfig
+import org.apache.http.client.methods.*
+import org.apache.http.config.Registry
+import org.apache.http.config.RegistryBuilder
+import org.apache.http.conn.socket.ConnectionSocketFactory
+import org.apache.http.conn.socket.PlainConnectionSocketFactory
+import org.apache.http.conn.ssl.NoopHostnameVerifier
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory
+import org.apache.http.entity.ContentType
+import org.apache.http.entity.InputStreamEntity
+import org.apache.http.impl.client.CloseableHttpClient
+import org.apache.http.impl.client.HttpClientBuilder
+import org.apache.http.impl.client.HttpClients
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
+import org.apache.http.message.BasicHeader
+import org.apache.http.message.BasicHttpEntityEnclosingRequest
+import org.apache.http.message.BasicHttpRequest
+import org.apache.http.protocol.HttpContext
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.cloud.context.environment.EnvironmentChangeEvent
+import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper
+import org.springframework.cloud.netflix.zuul.filters.ZuulProperties
+import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.Host
+import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException
+import org.springframework.context.event.EventListener
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.util.MultiValueMap
+import org.springframework.util.StringUtils
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import javax.servlet.http.HttpServletRequest;
+import javax.annotation.PostConstruct
+import javax.annotation.PreDestroy
+import javax.net.ssl.SSLContext
+import javax.net.ssl.X509TrustManager
+import javax.servlet.http.HttpServletRequest
+import java.security.SecureRandom
+import java.security.cert.CertificateException
+import java.security.cert.X509Certificate
 
-import org.apache.http.Header;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.ProtocolException;
-import org.apache.http.client.RedirectStrategy;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPatch;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicHttpEntityEnclosingRequest;
-import org.apache.http.message.BasicHttpRequest;
-import org.apache.http.protocol.HttpContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.cloud.context.environment.EnvironmentChangeEvent;
-import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
-import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
-import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.Host;
-import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException;
-import org.springframework.context.event.EventListener;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*
 
-import com.netflix.zuul.ZuulFilter;
-import com.netflix.zuul.context.RequestContext;
-
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.HTTPS_SCHEME;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.HTTP_SCHEME;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.ROUTE_TYPE;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SIMPLE_HOST_ROUTING_FILTER_ORDER;
-
-/**
- * Route {@link ZuulFilter} that sends requests to predetermined URLs via apache {@link HttpClient}.
- * URLs are found in {@link RequestContext#getRouteHost()}.
- *
- * @author Spencer Gibb
- * @author Dave Syer
- * @author Bilal Alp
- */
 public class CustomHostRoutingFilter extends ZuulFilter {
 
     private static final Logger log = LoggerFactory.getLogger(CustomHostRoutingFilter.class);
@@ -122,11 +91,11 @@ public class CustomHostRoutingFilter extends ZuulFilter {
 
         if (createNewClient) {
             try {
-                CustomHostRoutingFilter.this.httpClient.close();
+                httpClient.close();
             } catch (IOException ex) {
                 log.error("error closing client", ex);
             }
-            CustomHostRoutingFilter.this.httpClient = newClient();
+            httpClient = newClient();
         }
     }
 
@@ -169,9 +138,7 @@ public class CustomHostRoutingFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
-        return RequestContext.getCurrentContext().getRouteHost() != null
-                && RequestContext.getCurrentContext().sendZuulResponse()
-                && (RequestContext.getCurrentContext().get("CACHE_HIT") != Boolean.TRUE);
+         RequestContext.getCurrentContext().getRouteHost() != null && RequestContext.getCurrentContext().sendZuulResponse() && (RequestContext.getCurrentContext().get("CACHE_HIT") != Boolean.TRUE);
     }
 
     @Override
@@ -223,7 +190,7 @@ public class CustomHostRoutingFilter extends ZuulFilter {
     protected PoolingHttpClientConnectionManager newConnectionManager() {
         try {
             final SSLContext sslContext = SSLContext.getInstance("SSL");
-            sslContext.init(null, new TrustManager[]{new X509TrustManager() {
+            sslContext.init(null, [new X509TrustManager() {
                 @Override
                 public void checkClientTrusted(X509Certificate[] x509Certificates,
                                                String s) throws CertificateException {
@@ -238,7 +205,7 @@ public class CustomHostRoutingFilter extends ZuulFilter {
                 public X509Certificate[] getAcceptedIssuers() {
                     return null;
                 }
-            }}, new SecureRandom());
+            }], new SecureRandom());
 
             RegistryBuilder<ConnectionSocketFactory> registryBuilder = RegistryBuilder
                     .<ConnectionSocketFactory>create()
