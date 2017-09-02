@@ -108,6 +108,7 @@ public class SimpleHostRoutingFilter extends ZuulFilter {
     protected PoolingHttpClientConnectionManager connectionManager;
     protected CloseableHttpClient httpClient;
 
+
     @EventListener
     public void onPropertyChange(EnvironmentChangeEvent event) {
         boolean createNewClient = false;
@@ -196,8 +197,13 @@ public class SimpleHostRoutingFilter extends ZuulFilter {
         try {
             CloseableHttpResponse response = forward(this.httpClient, verb, uri, request,
                     headers, params, requestEntity);
-            setResponse(response);
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode > 199 && statusCode < 400) {
+                context.set("ROUTE_RESULT", Boolean.TRUE);
+            }
+            log.info("Request to {} received result {}", uri, statusCode);
         } catch (Exception ex) {
+            log.error("Request failed {}", uri);
             throw new ZuulRuntimeException(ex);
         }
         return null;
