@@ -32,7 +32,6 @@ import org.apache.http.conn.ssl.NoopHostnameVerifier
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.entity.ContentType
-import org.apache.http.entity.InputStreamEntity
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.client.HttpClients
@@ -43,71 +42,71 @@ import org.apache.http.message.BasicHttpRequest
 import org.apache.http.protocol.HttpContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.context.environment.EnvironmentChangeEvent
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.Host
 import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException
 import org.springframework.context.event.EventListener
+import org.springframework.stereotype.Component
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.util.StringUtils
+import org.springframework.web.util.UriComponentsBuilder
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 import javax.net.ssl.SSLContext
 import javax.net.ssl.X509TrustManager
 import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpSession
 import java.security.SecureRandom
 import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
+import java.util.stream.Collectors
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*
 
-public class CustomHostRoutingFilter extends ZuulFilter {
+@Component
+public class KcsHostRoutingFilter extends ZuulFilter {
 
-    private static final Logger log = LoggerFactory.getLogger(CustomHostRoutingFilter.class);
-
+    private static final Logger log = LoggerFactory.getLogger(KcsHostRoutingFilter.class);
     private final Timer connectionManagerTimer = new Timer(
             "CustomHostRoutingFilter.connectionManagerTimer", true);
 
-    protected boolean sslHostnameValidationEnabled;
-    protected boolean forceOriginalQueryStringEncoding;
+    boolean sslHostnameValidationEnabled;
+    boolean forceOriginalQueryStringEncoding;
 
-    protected ProxyRequestHelper helper;
-    protected Host hostProperties;
-    protected PoolingHttpClientConnectionManager connectionManager;
-    protected CloseableHttpClient httpClient;
+    ProxyRequestHelper helper;
+    Host hostProperties;
+    PoolingHttpClientConnectionManager connectionManager;
+    CloseableHttpClient httpClient;
+
+    Proxy proxy = null;
+
+    KancolleProperties kancolleProperties;
 
 
-    @EventListener
-    public void onPropertyChange(EnvironmentChangeEvent event) {
-        boolean createNewClient = false;
+    @Autowired
+    HttpSession session;
 
-        for (String key : event.getKeys()) {
-            if (key.startsWith("zuul.host.")) {
-                createNewClient = true;
-                break;
-            }
-        }
+    @Autowired
+    DmmLoginUserHelper userHelper;
 
-        if (createNewClient) {
-            try {
-                httpClient.close();
-            } catch (IOException ex) {
-                log.error("error closing client", ex);
-            }
-            httpClient = newClient();
-        }
-    }
-
-    public CustomHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties properties) {
+    KcsHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties properties,
+                         KancolleProperties kancolleProperties) {
         this.helper = helper;
         this.hostProperties = properties.getHost();
         this.sslHostnameValidationEnabled = properties.isSslHostnameValidationEnabled();
         this.forceOriginalQueryStringEncoding = properties
                 .isForceOriginalQueryStringEncoding();
+        this.kancolleProperties = kancolleProperties
+
+        if (kancolleProperties.proxy)
+            proxy = new Proxy(Proxy.Type.valueOf(kancolleProperties.proxyType), new InetSocketAddress(kancolleProperties.proxyIp, kancolleProperties.proxyPort))
     }
+
 
     @PostConstruct
     private void initialize() {
@@ -115,10 +114,10 @@ public class CustomHostRoutingFilter extends ZuulFilter {
         this.connectionManagerTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (CustomHostRoutingFilter.this.connectionManager == null) {
+                if (KcsHostRoutingFilter.this.connectionManager == null) {
                     return;
                 }
-                CustomHostRoutingFilter.this.connectionManager.closeExpiredConnections();
+                KcsHostRoutingFilter.this.connectionManager.closeExpiredConnections();
             }
         }, 30000, 5000);
     }
@@ -181,18 +180,39 @@ public class CustomHostRoutingFilter extends ZuulFilter {
 
 
     protected String preProcessUri(MultiValueMap<String, String> headers, HttpServletRequest request, String originUri) {
-        return originUri;
+        if (originUri.contains("/kcs/resources/image/world/") && originUri.endsWith(".png")) {
+            def worldIp = userHelper.getServer(request)
+            String ip = worldIp
+            def newUrl = Arrays.stream(ip.split("\\.")).mapToInt({ Integer.parseInt(it) })
+                    .mapToObj({ String.format("%03d", it) })
+                    .collect(Collectors.joining("_"))
+            def nu = originUri.replaceAll("/kcs/resources/image/world/.+", "/kcs/resources/image/world/" + newUrl + "_t.png")
+            return nu;
+        }
+        return originUri
     }
 
-    protected void preProcessHeader(MultiValueMap<String, String> headers,
-                                    HttpServletRequest request) {
-        // do nothing
+
+    protected void preProcessHeader(MultiValueMap<String, String> headers, HttpServletRequest request) {
+        def worldIp = userHelper.getServer(request)
+
+        headers.set('X-Requested-With', request.getHeader("X-requested-With") ?: "ShockwaveFlash/26.0.0.151");
+        def referer = request.getHeader("Referer")
+        if (referer && request.getRequestURI().contains("/kcsapi/")) {
+            headers.set("Origin", "http://$worldIp/");
+            def replacedRef = UriComponentsBuilder.fromHttpUrl(referer).host(worldIp).port(80).scheme("http").build().toUriString()
+            headers.set("Referer", replacedRef.replace(":80/", "/"))
+        } else {
+            headers.set("Referer", "http://www.dmm.com/netgame/social/-/gadgets/=/app_id=854854/")
+        }
+        headers.set("User-Agent", RequestContext.getCurrentContext().get("UA"))
+        headers.remove("Cookie")
     }
 
     protected PoolingHttpClientConnectionManager newConnectionManager() {
         try {
             final SSLContext sslContext = SSLContext.getInstance("SSL");
-            sslContext.init(null, [new X509TrustManager() {
+            sslContext.init(null, (X509TrustManager[]) [new X509TrustManager() {
                 @Override
                 public void checkClientTrusted(X509Certificate[] x509Certificates,
                                                String s) throws CertificateException {
@@ -211,8 +231,16 @@ public class CustomHostRoutingFilter extends ZuulFilter {
 
             RegistryBuilder<ConnectionSocketFactory> registryBuilder = RegistryBuilder
                     .<ConnectionSocketFactory> create()
-                    .register(HTTP_SCHEME, PlainConnectionSocketFactory.INSTANCE);
-            if (this.sslHostnameValidationEnabled) {
+                    .register(HTTP_SCHEME, new PlainConnectionSocketFactory() {
+                @Override
+                Socket createSocket(HttpContext context) throws IOException {
+                    if (proxy) {
+                        return new Socket(proxy)
+                    }
+                    return new Socket();
+                }
+            });
+            if (sslHostnameValidationEnabled) {
                 registryBuilder.register(HTTPS_SCHEME,
                         new SSLConnectionSocketFactory(sslContext));
             } else {
@@ -221,14 +249,15 @@ public class CustomHostRoutingFilter extends ZuulFilter {
             }
             final Registry<ConnectionSocketFactory> registry = registryBuilder.build();
 
-            this.connectionManager = new PoolingHttpClientConnectionManager(registry, null, null, null,
+            connectionManager = new PoolingHttpClientConnectionManager(registry, null, null, null,
                     hostProperties.getTimeToLive(), hostProperties.getTimeUnit());
-            this.connectionManager
-                    .setMaxTotal(this.hostProperties.getMaxTotalConnections());
-            this.connectionManager.setDefaultMaxPerRoute(
-                    this.hostProperties.getMaxPerRouteConnections());
-            return this.connectionManager;
-        } catch (Exception ex) {
+            connectionManager
+                    .setMaxTotal(hostProperties.getMaxTotalConnections());
+            connectionManager.setDefaultMaxPerRoute(
+                    hostProperties.getMaxPerRouteConnections());
+            return connectionManager;
+        }
+        catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -247,21 +276,7 @@ public class CustomHostRoutingFilter extends ZuulFilter {
                 .disableContentCompression()
                 .useSystemProperties().setDefaultRequestConfig(requestConfig)
                 .setRetryHandler(new KancolleHttpRequestRetryHandler(5, false))
-                .setRedirectStrategy(new RedirectStrategy() {
-            @Override
-            public boolean isRedirected(HttpRequest request,
-                                        HttpResponse response, HttpContext context)
-                    throws ProtocolException {
-                return false;
-            }
-
-            @Override
-            public HttpUriRequest getRedirect(HttpRequest request,
-                                              HttpResponse response, HttpContext context)
-                    throws ProtocolException {
-                return null;
-            }
-        }).build();
+                .build();
     }
 
     private CloseableHttpResponse forward(CloseableHttpClient httpclient, String verb,
@@ -273,16 +288,11 @@ public class CustomHostRoutingFilter extends ZuulFilter {
         URL host = RequestContext.getCurrentContext().getRouteHost();
         HttpHost httpHost = getHttpHost(host);
         uri = StringUtils.cleanPath((host.getPath() + uri).replaceAll("/{2,}", "/"));
-        int contentLength = request.getContentLength();
-
         ContentType contentType = null;
-
         if (request.getContentType() != null) {
             contentType = ContentType.parse(request.getContentType());
         }
-
         ByteArrayEntity entity = new ByteArrayEntity(ByteStreams.toByteArray(requestEntity), contentType);
-
         HttpRequest httpRequest = buildHttpRequest(verb, uri, entity, headers, params, request);
         try {
             log.debug(httpHost.getHostName() + " " + httpHost.getPort() + " "
@@ -398,21 +408,4 @@ public class CustomHostRoutingFilter extends ZuulFilter {
                 revertHeaders(response.getAllHeaders()));
     }
 
-    /**
-     * Add header names to exclude from proxied response in the current request.
-     *
-     * @param names
-     */
-    protected void addIgnoredHeaders(String... names) {
-        this.helper.addIgnoredHeaders(names);
-    }
-
-    /**
-     * Determines whether the filter enables the validation for ssl hostnames.
-     *
-     * @return true if enabled
-     */
-    boolean isSslHostnameValidationEnabled() {
-        return this.sslHostnameValidationEnabled;
-    }
 }
