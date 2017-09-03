@@ -1,18 +1,51 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org"
-      >
+      xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title><span th:utext="舰队收藏" th:remove="tag"></span></title>
+    <title><span th:utext="舰队收藏-POI" th:remove="tag"></span></title>
+    <style>
+        body {
+            margin: 0;
+            width: 800px;
+            height: 480px;
+        }
 
+        #flashWrap {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100% !important;
+            height: 100% !important;
+        }
 
+        #externalswf {
+            visibility: visible;
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
 </head>
 <body>
-<div class="content" >
-    <div class="main">
-        <iframe id="game_frame" name="game_frame" th:src="@{/account/game(id=${id},type='POI')}" width="900" height="1200"
-                scrolling="no" frameborder="0" border="0" style="height: 610px;">艦隊これくしょん -艦これ-
-        </iframe>
-    </div>
+<div id="flashWrap">
 </div>
+<script th:src="@{/webjars/jquery/2.2.4/jquery.min.js}"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // POI不支持https，所以这里强制写成http
+    var s = "http:" + '//' + location.hostname + (location.port ? ':' + location.port : '');
+    var flashUrl = s + [[${flash}]];
+    var obj = $("<embed></embed>");
+    obj.attr("id", "externalswf");
+    obj.attr("width", "800");
+    obj.attr("height", "480");
+    obj.attr("quality", "high");
+    obj.attr("wmode", "opaque");
+    obj.attr("bgcolor", "#ffffff");
+    obj.attr("allowscriptaccess", "always");
+    obj.attr("base", s + "/kcs/");
+    obj.attr("type", "application/x-shockwave-flash");
+    obj.attr("src", flashUrl);
+    $("#flashWrap").append(obj);
+    /*]]>*/
+</script>
 </body>
 </html>
