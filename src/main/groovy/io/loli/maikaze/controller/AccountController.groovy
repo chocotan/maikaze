@@ -41,7 +41,7 @@ class AccountController {
 
     @RequestMapping(value = "login", method = RequestMethod.GET)
     def login(Long id,
-              @RequestParam(defaultValue = "NONE") String type, Model model, Principal principal, HttpServletRequest request) {
+              @RequestParam(defaultValue = "game") String type, Model model, Principal principal, HttpServletRequest request) {
         try {
             if (!dmmAccountService.check(id, principal.principal.id)) {
                 throw new IllegalArgumentException("非法的请求")
@@ -51,11 +51,7 @@ class AccountController {
             model.addAttribute "flash", flash
             model.addAttribute "type", type
             model.addAttribute "id", id
-            if ("NONE" == type) {
-                "account/game"
-            }  else {
-                "account/${type.toLowerCase()}"
-            }
+            "account/${type.toLowerCase()}"
         } catch (Exception e) {
             logger.error("登录发生错误了, {}", ExceptionUtils.getStackTrace(e))
             model.addAttribute "error", e.message
@@ -66,7 +62,7 @@ class AccountController {
 
     @RequestMapping(value = "game", method = RequestMethod.GET)
     def game(Long id,
-             @RequestParam(defaultValue = "NONE") String type, Model model, Principal principal, HttpSession session) {
+             @RequestParam(defaultValue = "game") String type, Model model, Principal principal, HttpSession session) {
         try {
             if (!dmmAccountService.check(id, principal.principal.id)) {
                 throw new IllegalArgumentException("非法的请求")
@@ -74,11 +70,7 @@ class AccountController {
             model.addAttribute "flash", dmmAccountService.findById(id).lastFlashUrl
             model.addAttribute "type", type
             model.addAttribute "id", id
-            if ("NONE" == type) {
-                "account/game"
-            } else {
-                "account/${type.toLowerCase()}"
-            }
+            "account/${type.toLowerCase()}"
         } catch (Exception e) {
             logger.error("登录发生错误了, {}", ExceptionUtils.getStackTrace(e))
             model.addAttribute "error", e.message
@@ -101,7 +93,11 @@ class AccountController {
         def lctx = loginContextCache.get(id, session);
         session.setAttribute("lctx_$id", lctx)
         lctx.user_agent = request.getHeader "User-Agent"
-        lctx.reset(account.username, account.password)
+        def pwd = account.password ?: session.getAttribute(account.username);
+        if(!pwd){
+            throw new IllegalArgumentException("你需要重新登录dmm账号")
+        }
+        lctx.reset(account.username,pwd)
         def flashUrl = lctx.startLogin();
         account.token = lctx.$6_api_token
         account.startTime = lctx.$6_api_starttime
@@ -134,9 +130,19 @@ class AccountController {
     }
 
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    def updateSubmit(@ModelAttribute DmmAccount dmmAccount, Principal principal) {
+    def updateSubmit(
+            @ModelAttribute DmmAccount dmmAccount, Principal principal) {
         dmmAccount.user = principal.principal.user;
+        if (dmmAccount.type) {
+            session.setAttribute(dmmAccount.username, dmmAccount.password)
+            dmmAccount.password = null
+        }
+
         dmmAccountService.save(dmmAccount)
-        "redirect:list"
+        if (dmmAccount.type) {
+            "redirect:/account/login?id=${dmmAccount.id}&type=${dmmAccount.type}"
+        } else {
+            "redirect:list"
+        }
     }
 }

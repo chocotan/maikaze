@@ -29,14 +29,14 @@
                 <tbody>
                 <tr th:each="account: ${list}">
                     <td th:text="${account.username}"></td>
-                    <td th:text="'******'"></td>
+                    <td th:text="'未显示'"></td>
                     <td th:text="${#dates.format(account.lastLogin)}" th:if="${account.lastLogin}"></td>
                     <td th:if="${account.lastLogin eq null}"></td>
                     <td>
-                        <a th:href="@{/account/login(id=${account.id})}">登录(浏览器)</a>
-                        <a th:href="@{/account/login(id=${account.id},type='KCV')}">登录(74EO)</a>
-                        <a th:href="@{/account/login(id=${account.id},type='KCV')}">登录(KCV)</a>
-                        <a th:href="@{/account/login(id=${account.id},type='POI')}">登录(POI)</a>
+                        <a th:href="@{/account/login(id=${account.id},type='GAME')}" th:if="${account.password != null}">登录(浏览器)</a>
+                        <a th:href="@{/account/login(id=${account.id},type='KCV')}" th:if="${account.password != null}">登录(74EO)</a>
+                        <a th:href="@{/account/login(id=${account.id},type='KCV')}" th:if="${account.password != null}">登录(KCV)</a>
+                        <a th:href="@{/account/login(id=${account.id},type='POI')}" th:if="${account.password != null}">登录(POI)</a>
                         <!--<a th:href="@{/account/game(id=${account.id})}"-->
                             <!--th:if="${#httpSession.getAttribute('lctx_'+account.id)!=null}">进入游戏(浏览器)</a>-->
                         <a th:href="@{/account/edit(id=${account.id})}">编辑</a>
