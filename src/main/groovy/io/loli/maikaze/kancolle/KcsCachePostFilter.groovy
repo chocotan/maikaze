@@ -2,7 +2,7 @@ package io.loli.maikaze.kancolle
 
 import com.netflix.zuul.ZuulFilter
 import com.netflix.zuul.context.RequestContext
-import org.apache.commons.compress.utils.IOUtils
+import org.apache.commons.io.IOUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants
 import org.springframework.stereotype.Component
