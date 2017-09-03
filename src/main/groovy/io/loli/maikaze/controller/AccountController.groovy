@@ -53,10 +53,8 @@ class AccountController {
             model.addAttribute "id", id
             if ("NONE" == type) {
                 "account/game"
-            } else if ("POI" == type) {
-                "account/poi"
-            } else if ("KCV" == type) {
-                "account/kcv"
+            }  else {
+                "account/${type.toLowerCase()}"
             }
         } catch (Exception e) {
             logger.error("登录发生错误了, {}", ExceptionUtils.getStackTrace(e))
@@ -78,10 +76,8 @@ class AccountController {
             model.addAttribute "id", id
             if ("NONE" == type) {
                 "account/game"
-            } else if ("POI" == type) {
-                "account/poi"
-            } else if ("KCV" == type) {
-                "account/kcv"
+            } else {
+                "account/${type.toLowerCase()}"
             }
         } catch (Exception e) {
             logger.error("登录发生错误了, {}", ExceptionUtils.getStackTrace(e))

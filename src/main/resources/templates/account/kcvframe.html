@@ -1,0 +1,43 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title><span th:utext="舰队收藏" th:remove="tag"></span></title>
+    <style>
+        body {
+            width: 900px;
+            margin: 0;
+        }
+        #flashWrap{
+            width: 800px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+<div id="spacing_top" style="height:16px;"></div>
+<div id="flashWrap">
+</div>
+<div class="statistics">
+</div>
+<script th:src="@{/webjars/jquery/2.2.4/jquery.min.js}"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // POI不支持https，所以这里强制写成http
+    var s = "http:" + '//' + location.hostname + (location.port ? ':' + location.port : '');
+    var flashUrl = s + [[${flash}]];
+    var obj = $("<embed></embed>");
+    obj.attr("id", "externalswf");
+    obj.attr("width", "800");
+    obj.attr("height", "480");
+    obj.attr("quality", "high");
+    obj.attr("wmode", "opaque");
+    obj.attr("bgcolor", "#000000");
+    obj.attr("allowscriptaccess", "always");
+    obj.attr("base", s + "/kcs/");
+    obj.attr("type", "application/x-shockwave-flash");
+    obj.attr("src", flashUrl);
+    $("#flashWrap").append(obj);
+    /*]]>*/
+</script>
+</body>
+</html>
