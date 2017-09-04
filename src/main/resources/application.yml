@@ -1,8 +1,10 @@
+
 server:
   port: 80
   session:
     persistent: true
     store-dir: ${java.io.tmpdir}/maikaze
+    timeout: 7200000
 spring:
   output:
     ansi:
@@ -25,6 +27,8 @@ spring:
 
   thymeleaf:
     cache: false
+  application:
+    name: Maikaze
 kancolle:
   server-list:
      - 203.104.209.71
@@ -55,7 +59,7 @@ kancolle:
   get-world-url: http://203.104.209.7/kcsapi/api_world/get_id/%s/1/%d
   get-flash-url: http://%s/kcsapi/api_auth_member/dmmlogin/%s/1/%d
   main-flash-url: http://%s/kcs/mainD2.swf?api_token=%s&api_starttime=%s
-  proxy: flase
+  proxy: false
   proxy-ip: localhost
   proxy-port: 1080
   proxy-type: HTTP
@@ -70,5 +74,10 @@ zuul:
       path: /kcs/**
       url: http://localhost:10000/
   host:
-    connect-timeout-millis: 20000
-    socket-timeout-millis: 20000
+    connect-timeout-millis: 120000
+    socket-timeout-millis: 120000
+    max-per-route-connections: 1000
+    max-total-connections: 2000
+    time-to-live: 60000
+logging:
+  file: ${java.io.tmpdir}/logs/maikaze.log

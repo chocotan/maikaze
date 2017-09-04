@@ -36,12 +36,16 @@ public class KcsCachePreFilter extends ZuulFilter {
     @Autowired
     KcsCacheService kcsCacheUtil;
 
+    @Autowired
+    DmmLoginUserHelper helper;
+
 
     @Override
     Object run() {
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletRequest req = ctx.getRequest();
-        def cache = kcsCacheUtil.get(req.requestURI)
+        def url = helper.getRouteUrl(req)
+        def cache = kcsCacheUtil.get(url)
         if (cache) {
             cache.headers.forEach({ key, value -> ctx.getResponse().setHeader(key, value) })
             ctx.getResponse().getOutputStream().write(cache.bytes);

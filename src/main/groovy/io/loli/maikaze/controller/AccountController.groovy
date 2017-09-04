@@ -2,7 +2,7 @@ package io.loli.maikaze.controller
 
 import io.loli.maikaze.domains.DmmAccount
 import io.loli.maikaze.kancolle.KancolleProperties
-import io.loli.maikaze.kancolle.LoginAndUserServerCache
+import io.loli.maikaze.kancolle.DmmLoginUserHelper
 import io.loli.maikaze.service.DmmAccountService
 import javaslang.Tuple3
 import org.apache.commons.lang3.exception.ExceptionUtils
@@ -15,7 +15,9 @@ import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestParam
 
+import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpSession
 import java.security.Principal
 
@@ -38,12 +40,18 @@ class AccountController {
     }
 
     @RequestMapping(value = "login", method = RequestMethod.GET)
-    def login(Long id, Model model, Principal principal) {
+    def login(Long id,
+              @RequestParam(defaultValue = "game") String type, Model model, Principal principal, HttpServletRequest request) {
         try {
-            def tuple = dmmLogin(id)
+            if (!dmmAccountService.check(id, principal.principal.id)) {
+                throw new IllegalArgumentException("非法的请求")
+            }
+            def tuple = dmmLogin(id, request)
             def flash = tuple._1()
             model.addAttribute "flash", flash
-            "account/game"
+            model.addAttribute "type", type
+            model.addAttribute "id", id
+            "account/${type.toLowerCase()}"
         } catch (Exception e) {
             logger.error("登录发生错误了, {}", ExceptionUtils.getStackTrace(e))
             model.addAttribute "error", e.message
@@ -51,6 +59,24 @@ class AccountController {
         }
     }
 
+
+    @RequestMapping(value = "game", method = RequestMethod.GET)
+    def game(Long id,
+             @RequestParam(defaultValue = "game") String type, Model model, Principal principal, HttpSession session) {
+        try {
+            if (!dmmAccountService.check(id, principal.principal.id)) {
+                throw new IllegalArgumentException("非法的请求")
+            }
+            model.addAttribute "flash", dmmAccountService.findById(id).lastFlashUrl
+            model.addAttribute "type", type
+            model.addAttribute "id", id
+            "account/${type.toLowerCase()}"
+        } catch (Exception e) {
+            logger.error("登录发生错误了, {}", ExceptionUtils.getStackTrace(e))
+            model.addAttribute "error", e.message
+            list(model, principal)
+        }
+    }
 
     @Autowired
     KancolleProperties kcp;
@@ -59,38 +85,31 @@ class AccountController {
     HttpSession session;
 
     @Autowired
-    LoginAndUserServerCache loginContextCache
+    DmmLoginUserHelper loginContextCache
 
-    def dmmLogin(Long id) {
+    def dmmLogin(Long id, HttpServletRequest request) {
         // 登录指定ip的舰娘账号，并将登录结果放在session中
         def account = dmmAccountService.findById(id)
         def lctx = loginContextCache.get(id, session);
         session.setAttribute("lctx_$id", lctx)
-        lctx.user_agent = session.getAttribute "UA"
-        lctx.reset(account.username, account.password)
+        lctx.user_agent = request.getHeader "User-Agent"
+        def pwd = account.password ?: session.getAttribute(account.username);
+        if(!pwd){
+            throw new IllegalArgumentException("你需要重新登录dmm账号")
+        }
+        lctx.reset(account.username,pwd)
         def flashUrl = lctx.startLogin();
         account.token = lctx.$6_api_token
         account.startTime = lctx.$6_api_starttime
         account.lastLogin = new Date()
         account.serverIp = lctx.$5_world_ip
-        dmmAccountService.save(account)
         def finalFlashUrl = flashUrl.replace("http://" + lctx.$5_world_ip, "")
         lctx.finalFlashUrl = finalFlashUrl
+        account.lastFlashUrl = finalFlashUrl
+        dmmAccountService.save(account)
         Tuple3.of finalFlashUrl, lctx.$6_api_token, lctx.$6_api_starttime
     }
 
-    @RequestMapping(value = "game", method = RequestMethod.GET)
-    def game(Long id, Model model, Principal principal, HttpSession session) {
-        try {
-            def dmm = session.getAttribute("lctx_$id")
-            model.addAttribute "flash", dmm.finalFlashUrl
-            "account/game"
-        } catch (Exception e) {
-            logger.error("登录发生错误了, {}", ExceptionUtils.getStackTrace(e))
-            model.addAttribute "error", e.message
-            list(model, principal)
-        }
-    }
 
     @RequestMapping(value = "edit", method = RequestMethod.GET)
     def edit(Long id, Model model) {
@@ -111,9 +130,19 @@ class AccountController {
     }
 
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    def updateSubmit(@ModelAttribute DmmAccount dmmAccount, Principal principal) {
+    def updateSubmit(
+            @ModelAttribute DmmAccount dmmAccount, Principal principal) {
         dmmAccount.user = principal.principal.user;
+        if (dmmAccount.type) {
+            session.setAttribute(dmmAccount.username, dmmAccount.password)
+            dmmAccount.password = null
+        }
+
         dmmAccountService.save(dmmAccount)
-        "redirect:list"
+        if (dmmAccount.type) {
+            "redirect:/account/login?id=${dmmAccount.id}&type=${dmmAccount.type}"
+        } else {
+            "redirect:list"
+        }
     }
 }

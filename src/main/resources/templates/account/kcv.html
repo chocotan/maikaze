@@ -1,0 +1,23 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <title><span th:utext="舰队收藏" th:remove="tag"></span></title>
+
+    <style>
+        body{
+            margin:0;
+        }
+    </style>
+</head>
+<body>
+<div class="content">
+    <div class="main">
+        <iframe id="game_frame" name="game_frame" th:src="@{/account/game(id=${id},type='KCVFRAME')}" width="900"
+                height="1200"
+                scrolling="no" frameborder="0" border="0" style="height: 610px;">艦隊これくしょん -艦これ-
+        </iframe>
+    </div>
+</div>
+</body>
+</html>

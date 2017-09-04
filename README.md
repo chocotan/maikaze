@@ -26,5 +26,6 @@ kancolle.proxy-type: HTTP
 ```
 
 
-# TODO
-1. 修改Referer为flashurl
+## 其他
+
+1. POI似乎不支持https，所以poi.html里的protocol写死的是http

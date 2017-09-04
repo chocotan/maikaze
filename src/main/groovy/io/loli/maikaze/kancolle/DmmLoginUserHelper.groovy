@@ -11,11 +11,13 @@ import org.springframework.stereotype.Component
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpSession
+import java.util.stream.Collectors
+
 /**
  * Created by chocotan on 2017/8/22.
  */
 @Component
-class LoginAndUserServerCache {
+class DmmLoginUserHelper {
 
     private static Cache<Long, DmmLogin> contextCache = Caffeine.newInstance()
             .build();
@@ -58,5 +60,21 @@ class LoginAndUserServerCache {
         return contextCache.get(id, {
             new DmmLogin(properties: kcp, httpClientUtil: httpClientUtil)
         })
+    }
+
+
+    def getRouteUrl(HttpServletRequest request) {
+        String originUri = request.getRequestURI()
+        if (originUri.contains("/kcs/resources/image/world/") && originUri.endsWith(".png")) {
+            def worldIp = getServer(request)
+            String ip = worldIp
+            def newUrl = Arrays.stream(ip.split("\\.")).mapToInt({ Integer.parseInt(it) })
+                    .mapToObj({ String.format("%03d", it) })
+                    .collect(Collectors.joining("_"))
+            def nu = originUri.replaceAll("/kcs/resources/image/world/.+", "/kcs/resources/image/world/" + newUrl + "_t.png")
+            return nu;
+        } else {
+            originUri
+        }
     }
 }

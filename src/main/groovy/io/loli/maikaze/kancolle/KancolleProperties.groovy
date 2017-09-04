@@ -42,8 +42,8 @@ class KancolleProperties {
 
 
 
-    def proxy;
+    boolean proxy = false;
     def proxyIp;
-    def proxyPort;
+    Integer proxyPort;
     def proxyType;
 }

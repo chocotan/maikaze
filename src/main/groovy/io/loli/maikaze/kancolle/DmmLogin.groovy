@@ -6,6 +6,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.web.util.UriComponentsBuilder
 
+import javax.servlet.http.HttpServletRequest
+
 /**
  * Created by chocotan on 2017/8/20.
  */
@@ -57,7 +59,7 @@ public class DmmLogin {
 
 
     def startLogin() {
-        if(!getUserIdFromIframeUrl()){
+        if (!getUserIdFromIframeUrl()) {
             loginToken()
             ajaxGetToken()
             login()
@@ -70,7 +72,9 @@ public class DmmLogin {
 
     def loginToken() {
         def start = System.currentTimeMillis();
-        def loginPageResult = httpClientUtil.get(properties.loginUrl, null, properties.loginTokenHeaders);
+        def headers = properties.loginTokenHeaders.clone()
+        headers["User-Agent"] = user_agent
+        def loginPageResult = httpClientUtil.get(properties.loginUrl, null, headers);
         $1_html = loginPageResult
         def dmmToken = (loginPageResult =~ /"DMM_TOKEN", "(.+)(?=")/)[0][1]
         def token = (loginPageResult =~ /"token": "(.+)(?=")/)[0][1]
@@ -85,8 +89,11 @@ public class DmmLogin {
         def dmmToken = $1_dmm_token
         def token = $1_token
         logger.info("AJAX_GET_TOKEN:DMM_TOKEN=$dmmToken,TOKEN=$token")
-        properties.idKeysHeaders['DMM_TOKEN'] = dmmToken
-        def idKeysResult = httpClientUtil.post(properties.ajaxGetTokenUrl, ['token': token], properties.idKeysHeaders);
+        def headers = properties.idKeysHeaders.clone()
+
+        headers['DMM_TOKEN'] = dmmToken
+        headers['User-Agent'] = user_agent
+        def idKeysResult = httpClientUtil.post(properties.ajaxGetTokenUrl, ['token': token], headers);
         logger.info("AJAX_GET_TOKEN:RES=$idKeysResult,COST={}", System.currentTimeMillis() - start)
         $2_html = idKeysResult
         def resMap = JSON.parseObject(idKeysResult, Map)
@@ -108,7 +115,10 @@ public class DmmLogin {
                 (passwordToken): password
         ]
         logger.info("PREPARE_LOGIN:PARAMS={$params}")
-        def res = httpClientUtil.post(properties.getAuthUrl(), params, properties.loginAuthHeaders)
+
+        def headers = properties.loginAuthHeaders.clone();
+        headers['User-Agent'] = user_agent
+        def res = httpClientUtil.post(properties.getAuthUrl(), params, headers)
         if (res.contains("認証エラー")) {
             throw new DmmException("你需要在dmm网页上修改密码")
         }
@@ -122,9 +132,11 @@ public class DmmLogin {
 
     def getUserIdFromIframeUrl() {
         def start = System.currentTimeMillis();
-        def gameResult = httpClientUtil.get(properties.getGameUrl(), null, properties.simpleHeaders)
+        def headers = properties.simpleHeaders.clone();
+        headers['User-Agent'] = user_agent
+        def gameResult = httpClientUtil.get(properties.getGameUrl(), null, headers)
         $4_html = gameResult
-        if(gameResult.contains("ログイン")&&gameResult.contains("メールアドレス")){
+        if (gameResult.contains("ログイン") && gameResult.contains("メールアドレス")) {
             return false
         }
 
