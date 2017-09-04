@@ -28,7 +28,8 @@ public class KcsCachePreFilter extends ZuulFilter {
         def url = ctx.getRequest().getRequestURI()
         url.matches(".*/scenes/.+swf(\\?(VERSION|version)=.+)?") ||
                 url.matches(".*/kcs/sound/.*")||
-                url.matches(".*/kcs/resources/.*")
+                url.matches(".*/kcs/resources/.*") ||url.contains("/kcs/Core.swf")
+
     }
 
 
